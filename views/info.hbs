@@ -1,0 +1,13 @@
+   <h2>Данные пользователя:</h2>
+     <form action="/info" method="POST">
+        <input type="hidden" name="id" value="{{user.id}}" />
+        <label>Имя</label><br>
+        <input name="name" value="{{user.fullName}}"  class="field" /><br><br>
+        <label>E-mail</label><br>
+        <input name="email" type="email" value="{{user.email}}" class="field" /><br><br>
+        <label>Дата рождения</label><br>
+        <input name="birthdate" type="date" value="{{user.dateOfBirth}}" class="field" /><br><br>
+        <label>Пароль</label><br>
+        <input name="password" type="password" value="{{user.password}}" class="field" /><br><br>
+        <input type="submit" value="Сохранить изменения" />
+     </form>

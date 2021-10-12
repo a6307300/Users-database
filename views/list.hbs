@@ -1,0 +1,21 @@
+    <!DOCTYPE html>
+    <h2>Список пользователей</h2>
+    <table>
+        <tr><th>Имя</th><th>E-mail</th><th>Пароль</th><th>Дата рождения</th><th></th></tr>
+        {{#each users}}
+            <tr>
+                <td>{{this.name}}</td>
+                <td>{{this.email}}</td>
+                <td>{{this.password}}</td>
+                <td>{{this.dateOfBirth}}</td>
+                <td>
+                    {{!-- <a href="/info/{{this.id}}">Edit</a>| --}}
+                    {{!-- <form action="delete/{{this.id}}" method="POST" style="display:inline;">
+                        <input type="submit" value="Delete" />  --}}
+                    </form>
+                </td>
+            </tr>
+        {{/each}}
+    </table>
+
+    <a href="/create">New user</a>
