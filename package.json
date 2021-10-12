@@ -12,8 +12,6 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
-    "express-handlebars": "^5.3.4",
-    "hbs": "^4.1.2",
     "pg": "^8.7.1",
     "sequelize": "^6.7.0"
   },
