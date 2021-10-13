@@ -1,31 +1,15 @@
 const express = require("express");
 const Sequelize = require("sequelize");
-const userController = require("./controllers/userController");
-const User = require("./models/User");
-
-const userRouter = express.Router();
+const userRoute = require ("./routers/userRouter");
 
 const app = express();
 
-const urlencodedParser = express.urlencoded({ extended: false });
+app.use (userRoute);
 
 const sequelize = new Sequelize("baseAPI", "anna", "fusion", {
     dialect: "postgres",
     host: "localhost"
 });
-// const env = process.env.NODE_ENV || "development";
-// const config = require("./config/config.json")[env];
-// const sequelize = new Sequelize(
-//   config.database,
-//   config.username,
-//   config.password,
-//   config
-// );
-
-userRouter.use("/create", userController.addUser);
-userRouter.use("/", userController.getUsers);
-userRouter.use("/edit/:id", userController.editUser);
-userRouter.use("/delete/:id", userController.deleteUser);
 
 async function start() {
     try {
@@ -38,6 +22,20 @@ async function start() {
     }
   }
   start();
+
+
+
+
+
+
+  // const env = process.env.NODE_ENV || "development";
+// const config = require("./config/config.json")[env];
+// const sequelize = new Sequelize(
+//   config.database,
+//   config.username,
+//   config.password,
+//   config
+// );
 
 // app.get("/create", function (req, res) {
 //   res.render("create.hbs", {
@@ -111,3 +109,8 @@ async function start() {
 // });
 
 
+
+// userRouter.use("/create", userController.addUser);
+// userRouter.use("/", userController.getUsers);
+// userRouter.use("/edit/:id", userController.editUser);
+// userRouter.use("/delete/:id", userController.deleteUser);
