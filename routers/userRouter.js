@@ -3,9 +3,9 @@ const userControllers = require("../controllers/userController.js");
 
 const userRouter = Router();
 
-userRouter.use("/create", userControllers.addUser);
-userRouter.use("/", userControllers.getUsers);
-userRouter.use("/edit/:id", userControllers.editUser);
-userRouter.use("/delete/:id", userControllers.deleteUser);
+userRouter.post("/", userControllers.addUser);
+userRouter.get("/", userControllers.getUsers);
+userRouter.patch("/:id", userControllers.editUser);
+userRouter.delete("/:id", userControllers.deleteUser);
 
 module.exports = userRouter;

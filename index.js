@@ -3,8 +3,15 @@ const Sequelize = require("sequelize");
 const userRoute = require ("./routers/userRouter");
 
 const app = express();
+// const urlencodedParser = express.urlencoded({extended: false});
+const jsonParser = express.json();
 
-app.use (userRoute);
+// app.use(urlencodedParser)
+app.use(jsonParser);
+
+
+
+app.use("/user", userRoute);
 
 const sequelize = new Sequelize("baseAPI", "anna", "fusion", {
     dialect: "postgres",
@@ -14,7 +21,7 @@ const sequelize = new Sequelize("baseAPI", "anna", "fusion", {
 async function start() {
     try {
       await sequelize.sync({force: true});
-      app.listen(3000, () => {
+      app.listen(3002, () => {
         console.log("Server has been started");
       });
     } catch (e) {
@@ -22,8 +29,6 @@ async function start() {
     }
   }
   start();
-
-
 
 
 

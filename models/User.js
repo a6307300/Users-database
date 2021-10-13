@@ -5,7 +5,7 @@ const sequelize = new Sequelize("baseAPI", "anna", "fusion", {
   host: "localhost"
 });
 
-const User = sequelize.define ('User', {
+const user = sequelize.define ("user", {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
@@ -30,7 +30,7 @@ const User = sequelize.define ('User', {
     },
   });
 
-  module.exports = User;
+  module.exports = user;
 
 
 
