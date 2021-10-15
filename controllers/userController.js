@@ -4,14 +4,18 @@ const {validationResult} = require('express-validator');
 const jwt = require('jsonwebtoken');
 const {secret} = require ("../tokenKey");
 var bcrypt = require('bcryptjs');
+const NodeRSA = require('node-rsa');
+const {keyPublic} = require("../RSApublic");
 
-const generateToken = (id, roleUser) => {
-  const payload = {
-    id,
-    roleUser,
-  }
-  return jwt.sign(payload, secret, { expiresIn: '24h' } )
-}
+
+// const generateToken = (id, roleUser) => {
+//   const payload = {
+//     id,
+//     roleUser,
+//   }
+//   return jwt.sign(payload, secret, { expiresIn: '24h' } )
+// }
+
 
 exports.loginUser = async function(req,res) {
   try {
@@ -26,7 +30,13 @@ exports.loginUser = async function(req,res) {
     if (!checkPassword) {
       return res.status(400).json({ message: "Неверный пароль" })
     }
-    const token = generateToken(candidate.id, candidate.roleUser);
+    const tokenData = JSON.stringify({
+      "id":candidate.id,
+      "roleUser":candidate.roleValue,
+    });
+    console.log(tokenData);
+    // const token = generateToken(candidate.id, candidate.roleUser);
+    const token = keyPublic.encrypt(tokenData,'base64');
     return res.json({token});
 
   } catch (error) {
@@ -81,10 +91,9 @@ exports.addRole = async function (req, res) {
 
 exports.editUser = async function (req, res) {
   try {
-    console.log('req.b', req.body)
+    // console.log('req.b', req.body)
     const userid = req.params.id;
     const {fullName, email, password, dateOfBirth} = req.body;
-    
     await user.update({
       fullName,
       email,
@@ -94,9 +103,8 @@ exports.editUser = async function (req, res) {
     {
       where: { id: userid }
     })
-
     const userTarget = await user.findOne({ where: { id: userid }, raw: true });
-    res.json (userTarget);
+    return res.json (userTarget);
   } catch (error) {
     console.log('editUser error:', error)
     return res.status(500).json({ message: error.message })

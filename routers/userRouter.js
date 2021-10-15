@@ -9,7 +9,7 @@ const userRouter = Router();
 
 userRouter.get("/auth", userControllers.loginUser);
 userRouter.post("/", [
-    check('email', "Поле е-mail не должно быть пустым").notEmpty(),
+    check('email', "Проверьте, пожалуйста, введенный e-mail").isEmail(),
     check('password', "Длина пароля должна составлять не менее 5 и не более 16 символов").isLength({ min: 5, max: 16 }),
 ],
     userControllers.addUser);
