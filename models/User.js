@@ -1,9 +1,6 @@
-const { Sequelize, DataTypes } = require('sequelize');
-
-const sequelize = new Sequelize("baseAPI", "anna", "fusion", {
-  dialect: "postgres",
-  host: "localhost"
-});
+const { DataTypes } = require('sequelize');
+const role = require("./Role.js")
+const sequelize = require("../sequelizeForModels.js")
 
 const user = sequelize.define ("user", {
     id: {
@@ -19,6 +16,7 @@ const user = sequelize.define ("user", {
     email: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
     },
     password: {
       type: DataTypes.STRING,
@@ -29,42 +27,5 @@ const user = sequelize.define ("user", {
       allowNull: false,
     },
   });
-
+  // user.belongsTo(role);
   module.exports = user;
-
-
-
-
-// const Sequelize = require("sequelize");
-
-// const sequelize = new Sequelize("baseAPI", "anna", "fusion", {
-//   dialect: "postgres",
-//   host: "localhost"
-// });
-
-// const User = sequelize.define("user", {
-//     id: {
-//       type: Sequelize.INTEGER,
-//       autoIncrement: true,
-//       primaryKey: true,
-//       allowNull: false,
-//     },
-//     fullName: {
-//       type: Sequelize.STRING,
-//       allowNull: false,
-//     },
-//     email: {
-//       type: Sequelize.STRING,
-//       allowNull: false,
-//     },
-//     password: {
-//       type: Sequelize.STRING,
-//       allowNull: false,
-//     },
-//     dateOfBirth: {
-//       type: Sequelize.DATEONLY,
-//       allowNull: false,
-//     },
-//   });
-
-//   module.exports = User;
