@@ -1,42 +1,22 @@
 const express = require("express");
-const Sequelize = require("sequelize");
-const userRoute = require ("./routers/userRouter");
-const sequelize = require ("./sequelizeForModels");
-const user = require("./models/User.js");
-const role = require ("./models/Role.js");
+const userRoute = require("./routers/userRouter");
+const cors = require('cors')
 
 const app = express();
 
 const jsonParser = express.json();
+app.use(cors());
 app.use(jsonParser);
-
 app.use("/user", userRoute);
-role.hasMany(user);
 
-async function start() {
-    try {
-      await sequelize.sync();
-      app.listen(3000, () => {
-        console.log("Server has been started");
-      });
-    } catch (e) {
-      console.log(e);
-    }
+
+app.listen(3003, (err) => {
+  if (err) {
+    console.log('Server cant start', err);
+    process.exit(1);
   }
-  start();
-
-
-
+  console.log("Server has been started");
+});
 
   // const urlencodedParser = express.urlencoded({extended: false});
   // app.use(urlencodedParser)
-
-
-  // const env = process.env.NODE_ENV || "development";
-// const config = require("./config/config.json")[env];
-// const sequelize = new Sequelize(
-//   config.database,
-//   config.username,
-//   config.password,
-//   config
-// );

@@ -16,7 +16,6 @@ userRouter.post("/", [
 userRouter.get("/", auth, userControllers.getUsers);
 userRouter.patch("/:id", auth, userControllers.editUser);
 userRouter.delete("/:id", [auth, authAdmin], userControllers.deleteUser);
-userRouter.post("/role", userControllers.addRole);
 
 
 module.exports = userRouter;
