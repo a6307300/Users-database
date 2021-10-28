@@ -1,13 +1,18 @@
 const express = require("express");
+const path = require("path");
 const userRoute = require("./routers/userRouter");
 const cors = require('cors')
 
 const app = express();
 
 const jsonParser = express.json();
-app.use(cors());
+app.use(cors({
+  credentials:true
+}));
 app.use(jsonParser);
 app.use("/user", userRoute);
+app.use('/avatars', express.static(path.join(__dirname,'avatars')));
+
 
 
 app.listen(3003, (err) => {

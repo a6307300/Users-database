@@ -21,10 +21,10 @@ const User = sequelize.define("user", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  // dateOfBirth: {
-  //   type: DataTypes.DATEONLY,
-  //   allowNull: true,
-  // },
+  avatar: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   roleValue: {
     type: DataTypes.STRING,
     allowNull: false,

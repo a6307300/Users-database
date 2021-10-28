@@ -7,20 +7,40 @@ const { secret } = require("../tokenKey");
 var bcrypt = require('bcryptjs');
 const NodeRSA = require('node-rsa');
 const { keyPublic } = require("../RSApublic");
+const uuid = require ('uuid');
 
 
-// const generateToken = (id, roleUser) => {
-//   const payload = {
-//     id,
-//     roleUser,
-//   }
-//   return jwt.sign(payload, secret, { expiresIn: '24h' } )
-// }
 
+const generateToken = (id, roleUser) => {
+  const payload = {
+    id,
+    roleUser,
+  }
+  return jwt.sign(payload, secret, { expiresIn: '24h' } )
+}
+
+exports.uploadAvatar = async function (req, res) {
+  try {
+    const userid = req.params.id;
+    const file = req.file;
+    console.log(file.path)
+    await user.update({
+      avatar: file.path,
+      },
+      {
+        where: { id: userid }
+      });
+    const userTarget = await user.findOne({ where: { id: userid }, raw: true });
+    return res.json(userTarget.avatar);
+  } catch (error) {
+    console.log('uploadAvatar error:', error)
+    return res.status(500).json({ message: error.message })
+  }
+};
 
 exports.loginUser = async function (req, res) {
   try {
-    console.log('req.b', req.body);
+    console.log('req.b login', req.body);
     const { email, password } = req.body;
     const candidate = await user.findOne({ where: { email: email } });
     if (!candidate) {
@@ -35,10 +55,10 @@ exports.loginUser = async function (req, res) {
       "id": candidate.id,
       "roleUser": candidate.roleValue,
     });
-    console.log(tokenData);
-    // const token = generateToken(candidate.id, candidate.roleUser);
-    const token = keyPublic.encrypt(tokenData, 'base64');
-    return res.json({ token });
+    const token = generateToken(candidate.id, candidate.roleUser);
+    console.log({ token,candidate });
+    // const token = keyPublic.encrypt(tokenData, 'base64');
+    return res.json({ token,candidate });
 
   } catch (error) {
     console.log('loginUser error', error)
@@ -77,28 +97,39 @@ exports.addUser = async function (req, res) {
 exports.editUser = async function (req, res) {
   try {
     const userid = req.params.id;
-    const { fullName, email, password, dateOfBirth } = req.body;
+    const { fullName, email, password, oldPassword } = req.body;
+    const userTarget = await user.findOne({ where: { id: userid }, raw: true });
+    const checkPassword = bcrypt.compareSync(oldPassword, userTarget.password)
+    if (checkPassword) {
     await user.update({
-      fullName,
-      email,
-      password,
-      dateOfBirth,
+      fullName: fullName||user.fullName,
+      email: email || user.email,
+      password: password || user.password,
     },
       {
         where: { id: userid }
       })
-    const userTarget = await user.findOne({ where: { id: userid }, raw: true });
-    return res.json(userTarget);
+    }
+    const userTargetNew = await user.findOne({ where: { id: userid }, raw: true });
+    return res.json(userTargetNew);
   } catch (error) {
     console.log('editUser error:', error)
     return res.status(500).json({ message: error.message })
   }
 };
 
-exports.getUsers = async function (req, res) {
+exports.getUser = async function (req, res) {
   try {
-    const usersList = await user.findAll({ raw: true })
-    res.json(usersList)
+    const token = req.headers.authorization.split(" ")[1];
+    const candidate = jwt.verify(token, secret );
+    console.log(candidate)
+    const userTarget = await user.findOne({ where: { id: candidate.id }, raw: true })
+    const userTargetData = {
+      name: userTarget.fullName,
+      email: userTarget.email,
+      id: userTarget.id
+    }
+    res.json(true)
   } catch (error) {
     console.log('getUsers error:', error)
     return res.status(500).json({ message: error.message })

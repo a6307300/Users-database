@@ -2,20 +2,20 @@ const { Router } = require("express");
 const userControllers = require("../controllers/userController.js");
 const { check } = require('express-validator');
 const { auth } = require("../middleware/auth");
-const { authAdmin } = require("../middleware/authAdmin");
+const imagesMiddleware = require ("../middleware/avatar")
 
 
 const userRouter = Router();
 
-userRouter.get("/auth", userControllers.loginUser);
+userRouter.post("/auth", userControllers.loginUser);
 userRouter.post("/", [
     check('email', "Проверьте, пожалуйста, введенный e-mail").isEmail(),
-    check('password', "Длина пароля должна составлять не менее 5 и не более 16 символов").isLength({ min: 5, max: 16 }),
+    check('password', "Длина пароля должна составлять не менее 5 и не более 16 символов").isLength({ min: 3, max: 9 }),
 ],
     userControllers.addUser);
-userRouter.get("/", auth, userControllers.getUsers);
+userRouter.get("/", auth, userControllers.getUser);
 userRouter.patch("/:id", auth, userControllers.editUser);
-userRouter.delete("/:id", [auth, authAdmin], userControllers.deleteUser);
+userRouter.post("/:id/avatar", [auth, imagesMiddleware.single('file')],  userControllers.uploadAvatar);
 
 
 module.exports = userRouter;
