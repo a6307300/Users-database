@@ -51,10 +51,10 @@ exports.loginUser = async function (req, res) {
     if (!checkPassword) {
       return res.status(400).json({ message: "Неверный пароль" })
     }
-    const tokenData = JSON.stringify({
-      "id": candidate.id,
-      "roleUser": candidate.roleValue,
-    });
+    // const tokenData = JSON.stringify({
+    //   "id": candidate.id,
+    //   "roleUser": candidate.roleValue,
+    // });
     const token = generateToken(candidate.id, candidate.roleUser);
     console.log({ token,candidate });
     // const token = keyPublic.encrypt(tokenData, 'base64');
@@ -86,7 +86,8 @@ exports.addUser = async function (req, res) {
       dateOfBirth,
     })
     const userTarget = await user.findOne({ where: { email: email }, raw: true });
-    return res.json(userTarget);
+    const token = generateToken(userTarget.id, 'user');
+    return res.json({token, userTarget});
   }
   catch (error) {
     console.log('addUser error:', error)
@@ -102,7 +103,7 @@ exports.editUser = async function (req, res) {
     const checkPassword = bcrypt.compareSync(oldPassword, userTarget.password)
     if (checkPassword) {
     await user.update({
-      fullName: fullName||user.fullName,
+      fullName: fullName || user.fullName,
       email: email || user.email,
       password: password || user.password,
     },
@@ -110,8 +111,8 @@ exports.editUser = async function (req, res) {
         where: { id: userid }
       })
     }
-    const userTargetNew = await user.findOne({ where: { id: userid }, raw: true });
-    return res.json(userTargetNew);
+    const candidate = await user.findOne({ where: { id: userid }, raw: true });
+    return res.json(candidate);
   } catch (error) {
     console.log('editUser error:', error)
     return res.status(500).json({ message: error.message })
@@ -127,9 +128,10 @@ exports.getUser = async function (req, res) {
     const userTargetData = {
       name: userTarget.fullName,
       email: userTarget.email,
-      id: userTarget.id
+      id: userTarget.id,
+      ava: userTarget.ava,
     }
-    res.json(true)
+    return res.json(userTargetData)
   } catch (error) {
     console.log('getUsers error:', error)
     return res.status(500).json({ message: error.message })
