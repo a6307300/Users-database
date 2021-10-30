@@ -23,10 +23,6 @@ module.exports = {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      // dateOfBirth: {
-      //   type: DataTypes.DATEONLY,
-      //   allowNull: true,
-      // },
       roleValue: {
         type: DataTypes.STRING,
         allowNull: false,

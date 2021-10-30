@@ -43,6 +43,9 @@ User.associate = (models) => {
   User.belongsTo(models.role, {
     foreignKey: 'roleValue',
   });
+  User.hasMany(models.board, {
+    foreignKey: 'owner',
+  });
 };
 
 

@@ -11,24 +11,37 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       autoIncrement: true,
       primaryKey: true,
-      type: Sequelize.INTEGER
+      type: Sequelize.INTEGER,
     },
-    id: {
-      type: Sequelize.NUMBER
+    boardName: {
+      allowNull: false,
+      type: Sequelize.STRING,
+    },
+    owner: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: {
+          tableName: 'users',
+          // schema: 'schema',
+        },
+        key: 'id'
+      },
     },
     createdAt: {
       allowNull: false,
-      type: Sequelize.DATE
+      type: Sequelize.DATE,
     },
     updatedAt: {
       allowNull: false,
       type: Sequelize.DATE
     }
-  });
+  };
 },
-    static associate(models) {
-      // define association here
-    }
+Board.associate = (models) => {
+  Board.belongsTo(models.user, {
+    foreignKey: 'owner',
+  });
   };
   Board.init({
     id: DataTypes.NUMBER
@@ -37,4 +50,3 @@ module.exports = (sequelize, DataTypes) => {
     modelName: 'Board',
   });
   return Board;
-};
