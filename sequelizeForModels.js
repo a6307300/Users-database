@@ -1,12 +1,13 @@
 const { Sequelize } = require('sequelize');
 
-  const env = process.env.NODE_ENV || "development";
-const config = require("./db/config/config.json")[env];
+// eslint-disable-next-line no-undef
+const env = process.env.NODE_ENV || 'development';
+const config = require('./db/config/config.json')[env];
 const sequelize = new Sequelize(
-  config.database,
-  config.username,
-  config.password,
-  config
+    config.database,
+    config.username,
+    config.password,
+    config
 );
 module.exports = sequelize;
 

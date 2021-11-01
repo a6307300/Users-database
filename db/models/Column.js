@@ -1,23 +1,23 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../sequelizeForModels.js');
 
-const Board = sequelize.define('board', {
+const Column = sequelize.define('column', {
     id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: DataTypes.INTEGER,
     },
-    boardName: {
+    columnName: {
         allowNull: false,
         type: DataTypes.STRING,
     },
-    owner: {
+    board: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
             model: {
-                tableName: 'users',
+                tableName: 'boards',
                 // schema: 'schema',
             },
             key: 'id'
@@ -34,15 +34,15 @@ const Board = sequelize.define('board', {
 
 });
 
-Board.associate = (models) => {
-    Board.belongsTo(models.user, {
-        foreignKey: 'owner',
-    });
-    Board.hasMany(models.column, {
+Column.associate = (models) => {
+    Column.belongsTo(models.board, {
         foreignKey: 'board',
+    });
+    Column.hasMany(models.task, {
+        foreignKey: 'column',
         onDelete:'cascade',
         hooks:true,
     });
 };
 
-module.exports = Board;
+module.exports = Column;

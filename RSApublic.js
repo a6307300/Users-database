@@ -11,4 +11,4 @@ const keyPublic = new NodeRSA(publicKey);
 
 module.exports = {
     keyPublic,
-}
+};

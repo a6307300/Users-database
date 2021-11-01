@@ -1,20 +1,20 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require("../../sequelizeForModels.js")
+const sequelize = require('../../sequelizeForModels.js');
 
-const Role = sequelize.define("role", {
-  value: {
-    type: DataTypes.STRING,
-    unique: true,
-    defaultValue: "user",
-    primaryKey: true,
-    allowNull: false,
-  },
+const Role = sequelize.define('role', {
+    value: {
+        type: DataTypes.STRING,
+        unique: true,
+        defaultValue: 'user',
+        primaryKey: true,
+        allowNull: false,
+    },
 });
 
 Role.associate = (models) => {
-  Role.hasMany(models.user, {
-    foreignKey: 'roleValue',
-  });
+    Role.hasMany(models.user, {
+        foreignKey: 'roleValue',
+    });
 };
 
 

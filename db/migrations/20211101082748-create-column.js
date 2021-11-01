@@ -1,26 +1,23 @@
 'use strict';
-
-const { DataTypes } = require("sequelize");
-
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('boards', {
+    await queryInterface.createTable('columns', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
+        type: Sequelize.INTEGER
       },
-      boardName: {
+      columnName: {
         allowNull: false,
         type: Sequelize.STRING,
       },
-      owner: {
-        type: DataTypes.INTEGER,
+      board: {
+        type: Sequelize.INTEGER,
         allowNull: false,
         references: {
           model: {
-            tableName: 'users',
+            tableName: 'boards',
             // schema: 'schema',
           },
           key: 'id'
@@ -37,6 +34,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Boards');
+    await queryInterface.dropTable('columns');
   }
 };
