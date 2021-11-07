@@ -19,7 +19,7 @@ const auth = (req, res, next) => {
         req.user = decoded;
     } catch (error) {
         console.log('auth error:', error);
-        return res.status(400).json({ message: 'Проблема в auth.js' });
+        return res.status(401).json({ message: 'Проблема в auth.js' });
     }
     next();
 };

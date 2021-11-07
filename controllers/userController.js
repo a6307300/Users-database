@@ -50,7 +50,7 @@ exports.loginUser = async function (req, res) {
         const checkPassword = bcrypt.compareSync(password, candidate.password);
 
         if (!checkPassword) {
-            return res.status(400).json({ message: 'Неверный пароль' });
+            return res.status(401).json({ message: 'Неверный пароль' });
         }
         // const tokenData = JSON.stringify({
         //   "id": candidate.id,
@@ -134,6 +134,9 @@ exports.getUser = async function (req, res) {
         };
         return res.json(userTargetData);
     } catch (error) {
+        if(error=='TokenExpiredError: jwt expired') {
+            return res.status(401).json('11111');
+        }
         console.log('getUsers error:', error);
         return res.status(500).json({ message: error.message });
     }

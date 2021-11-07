@@ -2,7 +2,7 @@ const column = require('../db/models/Column');
 
 exports.addColumn = async function (req, res) {
     try {
-        const { columnName } = req.body;
+        const columnName = req.body.columnName;
         const board = req.params.board;
         const notClone = await column.findOne({
             where: {
@@ -27,7 +27,7 @@ exports.addColumn = async function (req, res) {
         return res.json(newColumn);
     }
     catch (error) {
-        console.log('addColumn error:', error);
+        console.log('add   Column error:', error);
         return res.status(500).json({ message: error.message });
     }
 };
@@ -46,7 +46,7 @@ exports.deleteColumn = async function (req, res) {
                     id,
                 }
             });
-            return res.json(`Колонка  номер ${id} удалена`);
+            return res.json(id);
         } else return res.status(403).json({message:`Колонки  номер ${id} не существует`});
     } catch (error) {
         console.log('deleteColumn error', error);
@@ -86,10 +86,67 @@ exports.editColumn = async function (req, res) {
     }
 };
 
+exports.replaceColumns = async function (req, res) {
+    try {
+        const { current, replaced } = req.body;
+        console.log(req.body);
+        const currentColumn = await column.findOne({
+            where: {
+                id: current,
+            }
+        });
+        const replacedColumn = await column.findOne({
+            where: {
+                id: replaced,
+            }
+        });
+
+        await column.update({
+            order: currentColumn.order,
+        },
+        {
+            where: {
+                id: replaced,
+            }
+        }
+        );
+
+        await column.update({
+            order: replacedColumn.order
+        },
+        {
+            where: {
+                id: current,
+            }
+        }
+        );
+        const columnList = await column.findAll({ where: { 
+            board: currentColumn.board 
+        }, 
+        order: [
+            ['order', 'ASC']
+        ],
+        raw: true });
+        console.log(columnList);
+        return res.json(columnList);
+
+    } catch (error) {
+        console.log('replaceColumns error:', error);
+        return res.status(500).json({ message: error.message });
+    }
+};
+
 exports.getColumns = async function (req, res) {
     try {
+        console.log(req.params.board);
         const board = req.params.board;
-        const columnList = await column.findAll({ where: { board: board }, raw: true });
+        const columnList = await column.findAll({ 
+            where: { 
+                board: board 
+            }, order: [
+                ['order', 'ASC']
+            ],
+            raw: true });
         return res.json(columnList);
     } catch (error) {
         console.log('getColumns error:', error);

@@ -49,6 +49,7 @@ exports.deleteTask = async function (req, res) {
 
 exports.editTask = async function (req, res) {
     try {
+        console.log(req.body);
         const { taskName, description, range } = req.body;
         const id = req.params.id;
         const changedTask = await task.findOne({
@@ -83,15 +84,67 @@ exports.editTask = async function (req, res) {
 
 exports.getTasks = async function (req, res) {
     try {
-        const column = req.params.column;
-        const taskList = await task.findAll({ 
-            where: { 
-                column,
-            }, raw: true
-        });
+        // const column = req.params.column;
+        const taskList = await task.findAll(
+        //     { 
+        //     where: { 
+        //         column,
+        //     }, raw: true
+        // }
+        );
         return res.json(taskList);
     } catch (error) {
         console.log('getTasks error:', error);
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+exports.replaceTask = async function (req, res) {
+    try {
+        const { current, replaced } = req.body;
+        console.log(req.body);
+        const currentTask = await task.findOne({
+            where: {
+                id: current,
+            }
+        });
+        const replacedTask = await task.findOne({
+            where: {
+                id: replaced,
+            }
+        });
+        console.log(currentTask);
+        console.log(replacedTask);
+        await task.update({
+            order: replacedTask.order,
+        },
+        {
+            where: {
+                id: replaced,
+            }
+        }
+        );
+        
+        await task.update({
+            order: replacedTask.order,
+            column: replacedTask.column,
+        },
+        {
+            where: {
+                id: current,
+            }
+        }
+        );
+        const taskList = await task.findAll({order: [
+            ['order', 'ASC'],
+            ['updatedAt', 'DESC']
+        ],
+        raw: true });
+        console.log(taskList);
+        return res.json(taskList);
+
+    } catch (error) {
+        console.log('replaceColumns error:', error);
         return res.status(500).json({ message: error.message });
     }
 };

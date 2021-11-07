@@ -8,6 +8,11 @@ module.exports = {
                 primaryKey: true,
                 type: Sequelize.INTEGER,
             },
+            order: {
+                allowNull: false,
+                autoIncrement: true,
+                type: Sequelize.INTEGER
+            },
             taskName: {
                 allowNull: false,
                 type: Sequelize.STRING,
@@ -23,6 +28,7 @@ module.exports = {
             column: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
+                onDelete: 'cascade',
                 references: {
                     model: {
                         tableName: 'columns',

@@ -32,6 +32,9 @@ exports.addBoard = async function (req, res) {
         return res.json(newBoard);
     }
     catch (error) {
+        if(error=='TokenExpiredError: jwt expired') {
+            return res.status(401).json('11111');
+        }
         console.log('addBoard error:', error);
         return res.status(500).json({ message: error.message });
     }
@@ -55,9 +58,12 @@ exports.deleteBoard = async function (req, res) {
                     id,
                 }
             });
-            return res.json(`Доска  номер ${id} удалена`);
+            return res.json(id);
         } else return res.status(403).json({ message: 'Доски с таким номером у Вас нет'});
     } catch (error) {
+        if(error=='TokenExpiredError: jwt expired') {
+            return res.status(401).json('11111');
+        }
         console.log('deleteBoard error', error);
         return res.status(500).json({ message: error.message });
     }
@@ -69,7 +75,7 @@ exports.editBoard = async function (req, res) {
         const ownerData = jwt.verify(token, secret );
         const owner=ownerData.id;
         const { boardName} = req.body;
-        const id = req.params.id;
+        const id = +req.params.id;
         const changedBoard = await board.findOne({
             where: {
                 id,
@@ -107,7 +113,10 @@ exports.getBoards = async function (req, res) {
         const boardList = await board.findAll({ where: { owner: owner.id }, raw: true });
         return res.json(boardList);
     } catch (error) {
-        console.log('getBoards error:', error);
+        if(error=='TokenExpiredError: jwt expired') {
+            return res.status(401).json('11111');
+        }
+        console.log(error);
         return res.status(500).json({ message: error.message });
     }
 };

@@ -15,6 +15,7 @@ const Board = sequelize.define('board', {
     owner: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        onDelete: 'CASCADE',
         references: {
             model: {
                 tableName: 'users',
@@ -23,15 +24,6 @@ const Board = sequelize.define('board', {
             key: 'id'
         },
     },
-    createdAt: {
-        allowNull: false,
-        type: DataTypes.DATE,
-    },
-    updatedAt: {
-        allowNull: false,
-        type: DataTypes.DATE
-    },
-
 });
 
 Board.associate = (models) => {

@@ -45,6 +45,7 @@ User.associate = (models) => {
     });
     User.hasMany(models.board, {
         foreignKey: 'owner',
+        onDelete: 'CASCADE',
     });
 };
 

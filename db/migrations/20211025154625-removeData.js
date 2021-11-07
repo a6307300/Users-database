@@ -1,18 +1,18 @@
 'use strict';
 
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
-    return queryInterface.removeColumn(
-      'users',
-      'dateOfBirth'
-    );
-  },
+    up: async (queryInterface) => {
+        return queryInterface.removeColumn(
+            'users',
+            'dateOfBirth'
+        );
+    },
 
-  down: async (queryInterface, Sequelize) => {
-    return queryInterface.addColumn(
-      'users',
-      'dateOfBirth',
-      Sequelize.DATEONLY
-    );
-  }
+    down: async (queryInterface, Sequelize) => {
+        return queryInterface.addColumn(
+            'users',
+            'dateOfBirth',
+            Sequelize.DATEONLY
+        );
+    }
 };

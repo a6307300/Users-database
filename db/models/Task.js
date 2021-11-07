@@ -8,6 +8,9 @@ const Task = sequelize.define('task', {
         primaryKey: true,
         type: DataTypes.INTEGER,
     },
+    order: {
+        type: DataTypes.INTEGER,
+    },
     taskName: {
         allowNull: false,
         type: DataTypes.STRING,
@@ -24,6 +27,7 @@ const Task = sequelize.define('task', {
     column: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        onDelete: 'CASCADE',
         references: {
             model: {
                 tableName: 'columns',

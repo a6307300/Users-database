@@ -8,6 +8,9 @@ const Column = sequelize.define('column', {
         primaryKey: true,
         type: DataTypes.INTEGER,
     },
+    order: {
+        type: DataTypes.INTEGER,
+    },
     columnName: {
         allowNull: false,
         type: DataTypes.STRING,
@@ -15,6 +18,7 @@ const Column = sequelize.define('column', {
     board: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        onDelete: 'CASCADE',
         references: {
             model: {
                 tableName: 'boards',
@@ -40,7 +44,7 @@ Column.associate = (models) => {
     });
     Column.hasMany(models.task, {
         foreignKey: 'column',
-        onDelete:'cascade',
+        onDelete: 'cascade',
         hooks:true,
     });
 };
