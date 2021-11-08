@@ -5,6 +5,7 @@ const userRoute = require('./routers/userRouter');
 const boardRoute = require('./routers/boardRouter');
 const columnRoute = require('./routers/columnRouter');
 const taskRoute = require('./routers/taskRouter');
+const commentRoute = require('./routers/commentRouter');
 const cors = require('cors');
 
 const app = express();
@@ -19,6 +20,7 @@ app.use('/boards', boardRoute);
 app.use('/boards/board', columnRoute);
 app.use('/boards/board/column', taskRoute);
 app.use('/avatars', express.static(path.join(__dirname,'avatars')));
+app.use('/task', commentRoute);
 
 
 

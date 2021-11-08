@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../sequelizeForModels.js');
 
-const Task = sequelize.define('task', {
+const Comment = sequelize.define('comment', {
     id: {
         allowNull: false,
         autoIncrement: true,
@@ -11,26 +11,29 @@ const Task = sequelize.define('task', {
     order: {
         type: DataTypes.INTEGER,
     },
-    taskName: {
+    comment: {
         allowNull: false,
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
     },
-    description: {
-        allowNull: true,
-        type: DataTypes.STRING,
-    },
-    range: {
-        allowNull: true,
-        defaultValue: 1,
-        type: DataTypes.INTEGER,
-    },
-    column: {
+    task: {
         type: DataTypes.INTEGER,
         allowNull: false,
         onDelete: 'CASCADE',
         references: {
             model: {
-                tableName: 'columns',
+                tableName: 'tasks',
+                // schema: 'schema',
+            },
+            key: 'id'
+        },
+    },
+    author: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        onDelete: 'CASCADE',
+        references: {
+            model: {
+                tableName: 'users',
                 // schema: 'schema',
             },
             key: 'id'
@@ -47,15 +50,13 @@ const Task = sequelize.define('task', {
 
 });
 
-Task.associate = (models) => {
-    Task.belongsTo(models.column, {
-        foreignKey: 'column',
-    });
-    Task.hasMany(models.comment, {
+Comment.associate = (models) => {
+    Comment.belongsTo(models.task, {
         foreignKey: 'task',
-        onDelete: 'cascade',
-        hooks:true,
+    });
+    Comment.belongsTo(models.user, {
+        foreignKey: 'author',
     });
 };
 
-module.exports = Task;
+module.exports = Comment;

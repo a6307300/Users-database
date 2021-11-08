@@ -40,7 +40,7 @@ exports.deleteTask = async function (req, res) {
                 id,
             }
         });
-        res.json(`Задача  номер ${id} удалена`);
+        res.json(id);
     } catch (error) {
         console.log('deleteTask error', error);
         return res.status(500).json({ message: error.message });
@@ -85,13 +85,11 @@ exports.editTask = async function (req, res) {
 exports.getTasks = async function (req, res) {
     try {
         // const column = req.params.column;
-        const taskList = await task.findAll(
-        //     { 
-        //     where: { 
-        //         column,
-        //     }, raw: true
-        // }
-        );
+        const taskList = await task.findAll({order: [
+            ['order', 'ASC'],
+            ['updatedAt', 'DESC']
+        ],
+        raw: true });
         return res.json(taskList);
     } catch (error) {
         console.log('getTasks error:', error);
@@ -116,7 +114,7 @@ exports.replaceTask = async function (req, res) {
         console.log(currentTask);
         console.log(replacedTask);
         await task.update({
-            order: replacedTask.order,
+            order: replacedTask.order+1,
         },
         {
             where: {
