@@ -7,7 +7,7 @@ const User = require('../db/models/User');
 
 exports.addComment = async function (req, res) {
     try {
-        const { commentText} = req.body;
+        const { commentText, authorName, authorAva} = req.body;
         const token = req.headers.authorization.split(' ')[1];
         const ownerData = jwt.verify(token, secret );
         const author=ownerData.id;
@@ -16,6 +16,8 @@ exports.addComment = async function (req, res) {
             comment: commentText,
             author,
             task,
+            authorName,
+            authorAva,
         });
         const newComment = await comment.findOne({
             where: {

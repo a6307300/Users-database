@@ -86,6 +86,7 @@ exports.getTasks = async function (req, res) {
     try {
         // const column = req.params.column;
         const taskList = await task.findAll({order: [
+            ['range', 'DESC'],
             ['order', 'ASC'],
             ['updatedAt', 'DESC']
         ],

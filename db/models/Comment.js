@@ -39,6 +39,14 @@ const Comment = sequelize.define('comment', {
             key: 'id'
         },
     },
+    authorName: {
+        allowNull: false,
+        type: DataTypes.STRING,
+    },
+    authorAva: {
+        allowNull: false,
+        type: DataTypes.STRING,
+    },
     createdAt: {
         allowNull: false,
         type: DataTypes.DATE,
