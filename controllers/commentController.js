@@ -1,6 +1,9 @@
+/* eslint-disable no-unused-vars */
 const comment = require('../db/models/Comment');
+// const user = require ('../db/models/User');
 const jwt = require('jsonwebtoken');
 const { secret } = require('../tokenKey');
+const User = require('../db/models/User');
 
 exports.addComment = async function (req, res) {
     try {
@@ -106,6 +109,18 @@ exports.getComments = async function (req, res) {
         return res.json(commentList);
     } catch (error) {
         console.log('getComments error:', error);
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+exports.getComment = async function (req, res) {
+    try {
+        const id = req.params.id;
+        const commentL = await comment.findOne({include: User});
+        // const autho= await commentL.getUser();
+        return res.json(commentL);
+    } catch (error) {
+        console.log('getComment error:', error);
         return res.status(500).json({ message: error.message });
     }
 };

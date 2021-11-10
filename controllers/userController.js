@@ -9,6 +9,8 @@ var bcrypt = require('bcryptjs');
 const NodeRSA = require('node-rsa');
 const { keyPublic } = require('../RSApublic');
 const uuid = require ('uuid');
+const comment = require('../db/models/Comment');
+const Comment = require('../db/models/Comment');
 
 
 

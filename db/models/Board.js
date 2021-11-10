@@ -24,6 +24,11 @@ const Board = sequelize.define('board', {
             key: 'id'
         },
     },
+    contributors: {
+        allowNull: false,
+        type: DataTypes.ARRAY(DataTypes.TEXT),
+        defaultValue: [],
+    },
 });
 
 Board.associate = (models) => {

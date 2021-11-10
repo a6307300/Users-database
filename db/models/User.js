@@ -39,12 +39,18 @@ const User = sequelize.define('user', {
     },
 });
 
+
+
 User.associate = (models) => {
     User.belongsTo(models.role, {
         foreignKey: 'roleValue',
     });
     User.hasMany(models.board, {
         foreignKey: 'owner',
+        onDelete: 'CASCADE',
+    });
+    User.hasMany(models.comment, { 
+        foreignKey: 'author',
         onDelete: 'CASCADE',
     });
 };

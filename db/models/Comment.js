@@ -51,7 +51,7 @@ const Comment = sequelize.define('comment', {
 });
 
 Comment.associate = (models) => {
-    Comment.belongsTo(models.task, {
+    Comment.belongsTo(models.task, { 
         foreignKey: 'task',
     });
     Comment.belongsTo(models.user, {

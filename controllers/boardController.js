@@ -1,6 +1,9 @@
+/* eslint-disable no-unused-vars */
 const board = require('../db/models/Board');
 const jwt = require('jsonwebtoken');
 const { secret } = require('../tokenKey');
+const sequelize = require('sequelize');
+const {Op} = require('sequelize');
 
 exports.addBoard = async function (req, res) {
     try {
@@ -115,6 +118,76 @@ exports.getBoards = async function (req, res) {
     } catch (error) {
         if(error=='TokenExpiredError: jwt expired') {
             return res.status(401).json('11111');
+        }
+        console.log(error);
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+exports.shareBoard = async function (req, res) {
+    try {
+        const token = req.headers.authorization.split(' ')[1];
+        const ownerData = jwt.verify(token, secret );
+        const owner=ownerData.id;
+        const { contributor } = req.body;
+        const id = +req.params.id;
+        
+        const changedBoard = await board.findOne({
+            where: {
+                id,
+                owner,
+            }
+        });
+        if (changedBoard) {
+            if(changedBoard.contributors) {
+                await board.update({
+                    'contributors': sequelize.fn('array_append', sequelize.col('contributors'),contributor)
+                
+                },
+                {
+                    where: {
+                        id,
+                    }
+                }
+                );
+            } else {
+                const contributors2=[contributor];
+                await board.update({
+                    contributors: contributors2
+                },
+                {
+                    where: {
+                        id,
+                    }
+                }
+                );
+            }
+            const changedBoardNew = await board.findOne({
+                where: {
+                    id,
+                }, raw: true
+            });
+            return res.json(changedBoardNew);
+        } else return res.status(403).json({ message: 'У вас нет такой доски' });
+    } catch (error) {
+        console.log('chareBoard error:', error);
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+exports.getBoardsContribut = async function (req, res) {
+    try {
+        const { contributor, contributorId } = req.body;
+        console.log(contributor);
+        const boardList = await board.findAll({ 
+            where: {
+                contributors: {[Op.contains]:[contributor]}
+            }
+            , raw: true });
+        return res.json(boardList);
+    } catch (error) {
+        if(error=='TokenExpiredError: jwt expired') {
+            return res.status(401).json('jwt expired');
         }
         console.log(error);
         return res.status(500).json({ message: error.message });

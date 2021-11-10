@@ -6,6 +6,7 @@ const commentRouter = Router();
 
 commentRouter.post('/comment/:task', commentControllers.addComment);
 commentRouter.get('/comment/:task', commentControllers.getComments);
+commentRouter.get('/commentOne/:id', commentControllers.getComment);
 commentRouter.patch('/comments/edit/:id', commentControllers.editComment);
 commentRouter.delete('/comments/:id',  commentControllers.deleteComment);
 
