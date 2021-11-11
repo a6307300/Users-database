@@ -84,13 +84,17 @@ exports.editTask = async function (req, res) {
 
 exports.getTasks = async function (req, res) {
     try {
-        // const column = req.params.column;
-        const taskList = await task.findAll({order: [
-            ['range', 'DESC'],
-            ['order', 'ASC'],
-            ['updatedAt', 'DESC']
-        ],
-        raw: true });
+        const column = +req.params.column;
+        const taskList = await task.findAll({
+            where: {
+                column,
+            },
+            order: [
+                ['range', 'DESC'],
+                ['order', 'ASC'],
+                ['updatedAt', 'DESC']
+            ],
+            raw: true });
         return res.json(taskList);
     } catch (error) {
         console.log('getTasks error:', error);
@@ -127,6 +131,7 @@ exports.replaceTask = async function (req, res) {
         await task.update({
             order: replacedTask.order,
             column: replacedTask.column,
+            range: replacedTask.range,
         },
         {
             where: {
@@ -135,7 +140,7 @@ exports.replaceTask = async function (req, res) {
         }
         );
         const taskList = await task.findAll({order: [
-            ['order', 'ASC'],
+            ['range', 'DESC'],
             ['updatedAt', 'DESC']
         ],
         raw: true });

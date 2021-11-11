@@ -136,39 +136,27 @@ exports.shareBoard = async function (req, res) {
             where: {
                 id,
                 owner,
+                contributors: {[Op.contains]:[contributor]}
             }
         });
-        if (changedBoard) {
-            if(changedBoard.contributors) {
-                await board.update({
-                    'contributors': sequelize.fn('array_append', sequelize.col('contributors'),contributor)
+        if (!changedBoard) {
+            await board.update({
+                'contributors': sequelize.fn('array_append', sequelize.col('contributors'),contributor)
                 
-                },
-                {
-                    where: {
-                        id,
-                    }
+            },
+            {
+                where: {
+                    id,
                 }
-                );
-            } else {
-                const contributors2=[contributor];
-                await board.update({
-                    contributors: contributors2
-                },
-                {
-                    where: {
-                        id,
-                    }
-                }
-                );
             }
+            );
             const changedBoardNew = await board.findOne({
                 where: {
                     id,
                 }, raw: true
             });
             return res.json(changedBoardNew);
-        } else return res.status(403).json({ message: 'У вас нет такой доски' });
+        } else return res.status(400).json({ message: 'Этот контрибьютор уже заявлен в этой доске' });
     } catch (error) {
         console.log('chareBoard error:', error);
         return res.status(500).json({ message: error.message });

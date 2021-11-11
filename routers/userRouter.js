@@ -13,7 +13,7 @@ userRouter.post('/', [
     check('password', 'Длина пароля должна составлять не менее 5 и не более 16 символов').isLength({ min: 3, max: 9 },),
 ],
 userControllers.addUser);
-userRouter.get('/', auth, userControllers.getUser);
+userRouter.get('/', userControllers.getUser);
 userRouter.patch('/:id', auth, userControllers.editUser);
 userRouter.post('/:id/avatar', [auth, imagesMiddleware.single('file')],  userControllers.uploadAvatar);
 

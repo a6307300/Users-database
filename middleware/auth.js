@@ -7,7 +7,7 @@ const { keyPrivate } = require('../RSAprivate');
 const auth = (req, res, next) => {
     try {
         const token = req.headers.authorization.split(' ')[1];
-        // console.log(token)
+        console.log(token);
         // const token = req.headers.authorization;
 
         if (!token) {
@@ -15,8 +15,8 @@ const auth = (req, res, next) => {
         }
         const decoded = jwt.verify(token, secret);
         // const decoded = keyPrivate.decrypt(token, 'utf8');
-        // console.log(decoded);
         req.user = decoded;
+        console.log(`Decoded: ${req.user}`);
     } catch (error) {
         console.log('auth error:', error);
         return res.status(401).json({ message: 'Проблема в auth.js' });

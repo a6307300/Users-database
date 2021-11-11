@@ -14,10 +14,9 @@ const Comment = require('../db/models/Comment');
 
 
 
-const generateToken = (id, roleUser) => {
+const generateToken = (id) => {
     const payload = {
         id,
-        roleUser,
     };
     return jwt.sign(payload, secret, { expiresIn: '24h' } );
 };
@@ -52,13 +51,13 @@ exports.loginUser = async function (req, res) {
         const checkPassword = bcrypt.compareSync(password, candidate.password);
 
         if (!checkPassword) {
-            return res.status(401).json({ message: 'Неверный пароль' });
+            return res.status(402).json({ message: 'Неверный пароль' });
         }
         // const tokenData = JSON.stringify({
         //   "id": candidate.id,
         //   "roleUser": candidate.roleValue,
         // });
-        const token = generateToken(candidate.id, candidate.roleUser);
+        const token = generateToken(candidate.id);
         console.log({ token,candidate });
         // const token = keyPublic.encrypt(tokenData, 'base64');
         return res.json({ token,candidate });
@@ -89,7 +88,7 @@ exports.addUser = async function (req, res) {
             dateOfBirth,
         });
         const userTarget = await user.findOne({ where: { email: email }, raw: true });
-        const token = generateToken(userTarget.id, 'user');
+        const token = generateToken(userTarget.id);
         return res.json({token, userTarget});
     }
     catch (error) {
@@ -124,22 +123,17 @@ exports.editUser = async function (req, res) {
 
 exports.getUser = async function (req, res) {
     try {
-        const token = req.headers.authorization.split(' ')[1];
+        const token = req.headers.authorization;
         const candidate = jwt.verify(token, secret );
-        console.log(candidate);
+        console.log(candidate.id);
         const userTarget = await user.findOne({ where: { id: candidate.id }, raw: true });
-        const userTargetData = {
-            name: userTarget.fullName,
-            email: userTarget.email,
-            id: userTarget.id,
-            ava: userTarget.ava,
-        };
-        return res.json(userTargetData);
+        if (!userTarget) return res.status(401).json('Ошибка авторизации');
+        return res.json({userTarget,token});
     } catch (error) {
         if(error=='TokenExpiredError: jwt expired') {
-            return res.status(401).json('11111');
+            return res.status(401).json('Срок действия ключа истек, авторизуйтесь, пожалуйста');
         }
-        console.log('getUsers error:', error);
+        console.log('getUser error:', error);
         return res.status(500).json({ message: error.message });
     }
 };
