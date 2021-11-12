@@ -1,10 +1,11 @@
 /* eslint-disable no-unused-vars */
-const comment = require('../db/models/Comment');
+// const comment = require('../db/models/Comment');
 // const user = require ('../db/models/User');
 const jwt = require('jsonwebtoken');
 const { secret } = require('../tokenKey');
-const User = require('../db/models/User');
-const Comment = require('../db/models/Comment');
+// const User = require('../db/models/User');
+
+const db = require ('../db/models');
 
 exports.addComment = async function (req, res) {
     try {
@@ -13,14 +14,14 @@ exports.addComment = async function (req, res) {
         const ownerData = jwt.verify(token, secret );
         const userID=ownerData.id;
         const taskID = req.params.task;
-        await comment.create({
+        await db.comment.create({
             comment: commentText,
             userID,
             taskID,
             authorName,
             authorAva,
         });
-        const newComment = await comment.findOne({
+        const newComment = await db.comment.findOne({
             where: {
                 comment: commentText,
             }, raw: true
@@ -40,7 +41,7 @@ exports.deleteComment = async function (req, res) {
         const token = req.headers.authorization.split(' ')[1];
         const ownerData = jwt.verify(token, secret );
         const userID=+ownerData.id;
-        const targetComment = await comment.findOne({
+        const targetComment = await db.comment.findOne({
             where: {
                 id,
                 userID,
@@ -48,7 +49,7 @@ exports.deleteComment = async function (req, res) {
         });
         console.log(targetComment);
         if (targetComment) {
-            await comment.destroy({
+            await db.comment.destroy({
                 where: {
                     id,
                 }
@@ -69,7 +70,7 @@ exports.editComment = async function (req, res) {
         const ownerData = jwt.verify(token, secret );
         const userID=ownerData.id;
         const id = +req.params.id;
-        const changedComment = await comment.findOne({
+        const changedComment = await db.comment.findOne({
             where: {
                 id,
                 userID,
@@ -77,7 +78,7 @@ exports.editComment = async function (req, res) {
         });
         console.log(changedComment);
         if (changedComment) {
-            await comment.update({
+            await db.comment.update({
                 comment: commentText,
             },
             {
@@ -86,7 +87,7 @@ exports.editComment = async function (req, res) {
                 }
             }
             );
-            const changedCommentNew = await comment.findOne({
+            const changedCommentNew = await db.comment.findOne({
                 where: {
                     id,
                 }, raw: true
@@ -102,10 +103,10 @@ exports.editComment = async function (req, res) {
 exports.getComments = async function (req, res) {
     try {
         const taskID = req.params.task;
-        const commentList = await comment.findAll({where: {
+        const commentList = await db.comment.findAll({where: {
             taskID,
         },
-        include: { model: User, as: 'author1' },
+        include: { model: db.user, as: 'author1' },
         order: [
             ['createdAt', 'DESC']
         ],
@@ -120,7 +121,7 @@ exports.getComments = async function (req, res) {
 exports.getComment = async function (req, res) {
     try {
         const id = req.params.id;
-        const commentL = await comment.findOne({include: User});
+        const commentL = await db.comment.findOne({include: db.user});
         // const autho= await commentL.getUser();
         return res.json(commentL);
     } catch (error) {
