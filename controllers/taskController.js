@@ -84,11 +84,11 @@ exports.editTask = async function (req, res) {
 
 exports.getTasks = async function (req, res) {
     try {
-        const column = +req.params.column;
+        // const column = +req.params.column;
         const taskList = await task.findAll({
-            where: {
-                column,
-            },
+            // where: {
+            //     column,
+            // },
             order: [
                 ['range', 'DESC'],
                 ['order', 'ASC'],
