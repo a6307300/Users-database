@@ -24,17 +24,10 @@ const Task = sequelize.define('task', {
         defaultValue: 1,
         type: DataTypes.INTEGER,
     },
-    column: {
+    columnID: {
         type: DataTypes.INTEGER,
         allowNull: false,
         onDelete: 'CASCADE',
-        references: {
-            model: {
-                tableName: 'columns',
-                // schema: 'schema',
-            },
-            key: 'id'
-        },
     },
     createdAt: {
         allowNull: false,
@@ -49,10 +42,10 @@ const Task = sequelize.define('task', {
 
 Task.associate = (models) => {
     Task.belongsTo(models.column, {
-        foreignKey: 'column',
+        foreignKey: 'columnID',
     });
     Task.hasMany(models.comment, {
-        foreignKey: 'task',
+        foreignKey: 'taskID',
         onDelete: 'cascade',
         hooks:true,
     });

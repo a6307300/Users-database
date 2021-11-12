@@ -17,9 +17,15 @@ module.exports = {
     },
 
     down: async (queryInterface) => {
-        return queryInterface.removeColumn(
-            'boards',
-            'contributors'
-        );
+        return Promise.all ([
+            queryInterface.removeColumn(
+                'comments',
+                'authorName',
+            ), 
+            queryInterface.removeColumn(
+                'comments',
+                'authorAva',
+            ),
+        ]);
     }
 };

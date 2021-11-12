@@ -17,7 +17,7 @@ module.exports = {
                 allowNull: false,
                 type: Sequelize.TEXT,
             },
-            task: {
+            taskID: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
                 onDelete: 'CASCADE',
@@ -29,7 +29,7 @@ module.exports = {
                     key: 'id'
                 },
             },
-            author: {
+            userID: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
                 onDelete: 'CASCADE',

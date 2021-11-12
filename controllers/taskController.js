@@ -3,11 +3,11 @@ const task = require('../db/models/Task');
 exports.addTask = async function (req, res) {
     try {
         const { taskName } = req.body;
-        const column = req.params.column;
+        const columnID = +req.params.column;
         const notClone = await task.findOne({
             where: {
                 taskName,
-                column,
+                columnID,
             }
         });
         if (notClone) {
@@ -17,7 +17,7 @@ exports.addTask = async function (req, res) {
         }
         await task.create({
             taskName,
-            column,
+            columnID,
         });
         const newTask = await task.findOne({
             where: {
@@ -130,7 +130,7 @@ exports.replaceTask = async function (req, res) {
         
         await task.update({
             order: replacedTask.order,
-            column: replacedTask.column,
+            columnID: replacedTask.columnID,
             range: replacedTask.range,
         },
         {
@@ -141,6 +141,7 @@ exports.replaceTask = async function (req, res) {
         );
         const taskList = await task.findAll({order: [
             ['range', 'DESC'],
+            ['order', 'ASC'],
             ['updatedAt', 'DESC']
         ],
         raw: true });

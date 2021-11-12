@@ -3,11 +3,11 @@ const column = require('../db/models/Column');
 exports.addColumn = async function (req, res) {
     try {
         const columnName = req.body.columnName;
-        const board = req.params.board;
+        const boardID = req.params.board;
         const notClone = await column.findOne({
             where: {
                 columnName,
-                board,
+                boardID,
             }
         });
         if (notClone) {
@@ -17,7 +17,7 @@ exports.addColumn = async function (req, res) {
         }
         await column.create({
             columnName,
-            board,
+            boardID,
         });
         const newColumn = await column.findOne({
             where: {
@@ -121,7 +121,7 @@ exports.replaceColumns = async function (req, res) {
         }
         );
         const columnList = await column.findAll({ where: { 
-            board: currentColumn.board 
+            boardID: currentColumn.boardID 
         }, 
         order: [
             ['order', 'ASC']
@@ -139,10 +139,10 @@ exports.replaceColumns = async function (req, res) {
 exports.getColumns = async function (req, res) {
     try {
         console.log(req.params.board);
-        const board = req.params.board;
+        const boardID = +req.params.board;
         const columnList = await column.findAll({ 
             where: { 
-                board: board 
+                boardID 
             }, order: [
                 ['order', 'ASC']
             ],

@@ -15,29 +15,15 @@ const Comment = sequelize.define('comment', {
         allowNull: false,
         type: DataTypes.TEXT,
     },
-    task: {
+    taskID: {
         type: DataTypes.INTEGER,
         allowNull: false,
         onDelete: 'CASCADE',
-        references: {
-            model: {
-                tableName: 'tasks',
-                // schema: 'schema',
-            },
-            key: 'id'
-        },
     },
-    author: {
+    userID: {
         type: DataTypes.INTEGER,
         allowNull: false,
         onDelete: 'CASCADE',
-        references: {
-            model: {
-                tableName: 'users',
-                // schema: 'schema',
-            },
-            key: 'id'
-        },
     },
     authorName: {
         allowNull: false,
@@ -60,11 +46,11 @@ const Comment = sequelize.define('comment', {
 
 Comment.associate = (models) => {
     Comment.belongsTo(models.task, { 
-        foreignKey: 'task',
+        foreignKey: 'taskID',
     });
     Comment.belongsTo(models.user, {
         as: 'comment',
-        foreignKey: 'author',
+        foreignKey: 'userID',
     });
 };
 

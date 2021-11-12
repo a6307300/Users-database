@@ -17,7 +17,7 @@ module.exports = {
                 allowNull: false,
                 type: Sequelize.STRING,
             },
-            board: {
+            boardID: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
                 onDelete: 'CASCADE',

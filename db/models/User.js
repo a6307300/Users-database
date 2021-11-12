@@ -30,13 +30,6 @@ const User = sequelize.define('user', {
         type: DataTypes.STRING,
         allowNull: false,
         defaultValue: 'user',
-        references: {
-            model: {
-                tableName: 'roles',
-                // schema: 'schema',
-            },
-            key: 'id'
-        },
     },
 });
 
@@ -49,8 +42,8 @@ User.associate = (models) => {
         onDelete: 'CASCADE',
     });
     User.hasMany(models.comment, { 
-        as: 'author',
-        foreignKey: 'author',
+        as: 'author1',
+        foreignKey: 'userID',
         onDelete: 'CASCADE',
     });
 };

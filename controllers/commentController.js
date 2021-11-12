@@ -11,12 +11,12 @@ exports.addComment = async function (req, res) {
         const { commentText, authorName, authorAva} = req.body;
         const token = req.headers.authorization.split(' ')[1];
         const ownerData = jwt.verify(token, secret );
-        const author=ownerData.id;
-        const task = req.params.task;
+        const userID=ownerData.id;
+        const taskID = req.params.task;
         await comment.create({
             comment: commentText,
-            author,
-            task,
+            userID,
+            taskID,
             authorName,
             authorAva,
         });
@@ -39,11 +39,11 @@ exports.deleteComment = async function (req, res) {
         const  id  = +req.params.id;
         const token = req.headers.authorization.split(' ')[1];
         const ownerData = jwt.verify(token, secret );
-        const author=+ownerData.id;
+        const userID=+ownerData.id;
         const targetComment = await comment.findOne({
             where: {
                 id,
-                author,
+                userID,
             }, raw: true
         });
         console.log(targetComment);
@@ -67,12 +67,12 @@ exports.editComment = async function (req, res) {
         const { commentText} = req.body;
         const token = req.headers.authorization.split(' ')[1];
         const ownerData = jwt.verify(token, secret );
-        const author=ownerData.id;
+        const userID=ownerData.id;
         const id = +req.params.id;
         const changedComment = await comment.findOne({
             where: {
                 id,
-                author,
+                userID,
             }
         });
         console.log(changedComment);
@@ -101,11 +101,11 @@ exports.editComment = async function (req, res) {
 
 exports.getComments = async function (req, res) {
     try {
-        const task = req.params.task;
+        const taskID = req.params.task;
         const commentList = await comment.findAll({where: {
-            task,
+            taskID,
         },
-        include: [{ association: Comment, as: 'comment' }],
+        include: { model: User, as: 'author1' },
         order: [
             ['createdAt', 'DESC']
         ],

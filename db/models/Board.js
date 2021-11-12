@@ -16,13 +16,6 @@ const Board = sequelize.define('board', {
         type: DataTypes.INTEGER,
         allowNull: false,
         onDelete: 'CASCADE',
-        references: {
-            model: {
-                tableName: 'users',
-                // schema: 'schema',
-            },
-            key: 'id'
-        },
     },
     contributors: {
         allowNull: false,
@@ -36,7 +29,7 @@ Board.associate = (models) => {
         foreignKey: 'owner',
     });
     Board.hasMany(models.column, {
-        foreignKey: 'board',
+        foreignKey: 'boardID',
         onDelete:'cascade',
         hooks:true,
     });

@@ -15,17 +15,10 @@ const Column = sequelize.define('column', {
         allowNull: false,
         type: DataTypes.STRING,
     },
-    board: {
+    boardID: {
         type: DataTypes.INTEGER,
         allowNull: false,
         onDelete: 'CASCADE',
-        references: {
-            model: {
-                tableName: 'boards',
-                // schema: 'schema',
-            },
-            key: 'id'
-        },
     },
     createdAt: {
         allowNull: false,
@@ -40,10 +33,10 @@ const Column = sequelize.define('column', {
 
 Column.associate = (models) => {
     Column.belongsTo(models.board, {
-        foreignKey: 'board',
+        foreignKey: 'boardID',
     });
     Column.hasMany(models.task, {
-        foreignKey: 'column',
+        foreignKey: 'columnID',
         onDelete: 'cascade',
         hooks:true,
     });

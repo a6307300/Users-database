@@ -12,7 +12,7 @@ module.exports = {
     down: async (queryInterface) => {
         return queryInterface.removeColumn(
             'boards',
-            'contributors'
+            'contributors',
         );
     }
 };
