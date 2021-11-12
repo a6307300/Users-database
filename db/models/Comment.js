@@ -63,8 +63,10 @@ Comment.associate = (models) => {
         foreignKey: 'task',
     });
     Comment.belongsTo(models.user, {
+        as: 'comment',
         foreignKey: 'author',
     });
 };
+
 
 module.exports = Comment;

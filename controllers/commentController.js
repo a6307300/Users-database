@@ -4,6 +4,7 @@ const comment = require('../db/models/Comment');
 const jwt = require('jsonwebtoken');
 const { secret } = require('../tokenKey');
 const User = require('../db/models/User');
+const Comment = require('../db/models/Comment');
 
 exports.addComment = async function (req, res) {
     try {
@@ -104,6 +105,7 @@ exports.getComments = async function (req, res) {
         const commentList = await comment.findAll({where: {
             task,
         },
+        include: [{ association: Comment, as: 'comment' }],
         order: [
             ['createdAt', 'DESC']
         ],

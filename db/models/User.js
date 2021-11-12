@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../sequelizeForModels.js');
 
+
 const User = sequelize.define('user', {
     id: {
         type: DataTypes.INTEGER,
@@ -39,8 +40,6 @@ const User = sequelize.define('user', {
     },
 });
 
-
-
 User.associate = (models) => {
     User.belongsTo(models.role, {
         foreignKey: 'roleValue',
@@ -50,6 +49,7 @@ User.associate = (models) => {
         onDelete: 'CASCADE',
     });
     User.hasMany(models.comment, { 
+        as: 'author',
         foreignKey: 'author',
         onDelete: 'CASCADE',
     });
