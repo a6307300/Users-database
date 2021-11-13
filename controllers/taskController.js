@@ -1,10 +1,10 @@
-const task = require('../db/models/Task');
+const db = require ('../db/models');
 
 exports.addTask = async function (req, res) {
     try {
         const { taskName } = req.body;
         const columnID = +req.params.column;
-        const notClone = await task.findOne({
+        const notClone = await db.task.findOne({
             where: {
                 taskName,
                 columnID,
@@ -15,11 +15,11 @@ exports.addTask = async function (req, res) {
                 message: 'У Вас уже есть задача с таким именем!'
             });
         }
-        await task.create({
+        await db.task.create({
             taskName,
             columnID,
         });
-        const newTask = await task.findOne({
+        const newTask = await db.task.findOne({
             where: {
                 taskName,
             }, raw: true
@@ -35,7 +35,7 @@ exports.addTask = async function (req, res) {
 exports.deleteTask = async function (req, res) {
     try {
         const  id  = req.params.id;
-        await task.destroy({
+        await db.task.destroy({
             where: {
                 id,
             }
@@ -52,16 +52,16 @@ exports.editTask = async function (req, res) {
         console.log(req.body);
         const { taskName, description, range } = req.body;
         const id = req.params.id;
-        const changedTask = await task.findOne({
+        const changedTask = await db.task.findOne({
             where: {
                 id,
             }
         });
         if (changedTask) {
-            await task.update({
-                taskName: taskName||task.taskName,
-                description: description||task.description,
-                range: range||task.range,
+            await db.task.update({
+                taskName: taskName||db.task.taskName,
+                description: description||db.task.description,
+                range: range||db.task.range,
             },
             {
                 where: {
@@ -69,7 +69,7 @@ exports.editTask = async function (req, res) {
                 }
             }
             );
-            const changedTaskNew = await task.findOne({
+            const changedTaskNew = await db.task.findOne({
                 where: {
                     id,
                 }, raw: true
@@ -85,7 +85,7 @@ exports.editTask = async function (req, res) {
 exports.getTasks = async function (req, res) {
     try {
         // const column = +req.params.column;
-        const taskList = await task.findAll({
+        const taskList = await db.task.findAll({
             // where: {
             //     column,
             // },
@@ -106,19 +106,19 @@ exports.replaceTask = async function (req, res) {
     try {
         const { current, replaced } = req.body;
         console.log(req.body);
-        const currentTask = await task.findOne({
+        const currentTask = await db.task.findOne({
             where: {
                 id: current,
             }
         });
-        const replacedTask = await task.findOne({
+        const replacedTask = await db.task.findOne({
             where: {
                 id: replaced,
             }
         });
         console.log(currentTask);
         console.log(replacedTask);
-        await task.update({
+        await db.task.update({
             order: replacedTask.order+1,
         },
         {
@@ -128,7 +128,7 @@ exports.replaceTask = async function (req, res) {
         }
         );
         
-        await task.update({
+        await db.task.update({
             order: replacedTask.order,
             columnID: replacedTask.columnID,
             range: replacedTask.range,
@@ -139,7 +139,7 @@ exports.replaceTask = async function (req, res) {
             }
         }
         );
-        const taskList = await task.findAll({order: [
+        const taskList = await db.task.findAll({order: [
             ['range', 'DESC'],
             ['order', 'ASC'],
             ['updatedAt', 'DESC']

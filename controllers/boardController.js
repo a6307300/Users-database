@@ -1,9 +1,10 @@
 /* eslint-disable no-unused-vars */
-const board = require('../db/models/Board');
 const jwt = require('jsonwebtoken');
 const { secret } = require('../tokenKey');
 const sequelize = require('sequelize');
 const {Op} = require('sequelize');
+
+const db = require ('../db/models');
 
 exports.addBoard = async function (req, res) {
     try {
@@ -12,7 +13,7 @@ exports.addBoard = async function (req, res) {
         const token = req.headers.authorization.split(' ')[1];
         const ownerData = jwt.verify(token, secret );
         const owner=ownerData.id;
-        const notClone = await board.findOne({
+        const notClone = await db.board.findOne({
             where: {
                 boardName,
                 owner,
@@ -23,11 +24,11 @@ exports.addBoard = async function (req, res) {
                 message: 'У Вас уже есть доска с таким именем!'
             });
         }
-        await board.create({
+        await db.board.create({
             boardName,
             owner
         });
-        const newBoard = await board.findOne({
+        const newBoard = await db.board.findOne({
             where: {
                 boardName,
             }, raw: true
@@ -49,14 +50,14 @@ exports.deleteBoard = async function (req, res) {
         const ownerData = jwt.verify(token, secret );
         const owner=ownerData.id;
         const  id  = req.params.id;
-        const boardTarget = await board.findOne({
+        const boardTarget = await db.board.findOne({
             where: {
                 id,
                 owner
             }
         });
         if (boardTarget) {
-            await board.destroy({
+            await db.board.destroy({
                 where: {
                     id,
                 }
@@ -79,15 +80,15 @@ exports.editBoard = async function (req, res) {
         const owner=ownerData.id;
         const { boardName} = req.body;
         const id = +req.params.id;
-        const changedBoard = await board.findOne({
+        const changedBoard = await db.board.findOne({
             where: {
                 id,
                 owner,
             }
         });
         if (changedBoard) {
-            await board.update({
-                boardName: boardName || board.boardName,
+            await db.board.update({
+                boardName: boardName || db.board.boardName,
             },
             {
                 where: {
@@ -95,7 +96,7 @@ exports.editBoard = async function (req, res) {
                 }
             }
             );
-            const changedBoardNew = await board.findOne({
+            const changedBoardNew = await db.board.findOne({
                 where: {
                     id,
                 }, raw: true
@@ -113,7 +114,7 @@ exports.getBoards = async function (req, res) {
         const token = req.headers.authorization.split(' ')[1];
         const owner = jwt.verify(token, secret );
         console.log(owner);
-        const boardList = await board.findAll({ where: { owner: owner.id }, raw: true });
+        const boardList = await db.board.findAll({ where: { owner: owner.id }, raw: true });
         return res.json(boardList);
     } catch (error) {
         if(error=='TokenExpiredError: jwt expired') {
@@ -132,7 +133,7 @@ exports.shareBoard = async function (req, res) {
         const { contributor } = req.body;
         const id = +req.params.id;
         
-        const changedBoard = await board.findOne({
+        const changedBoard = await db.board.findOne({
             where: {
                 id,
                 owner,
@@ -140,7 +141,7 @@ exports.shareBoard = async function (req, res) {
             }
         });
         if (!changedBoard) {
-            await board.update({
+            await db.board.update({
                 'contributors': sequelize.fn('array_append', sequelize.col('contributors'),contributor)
                 
             },
@@ -150,7 +151,7 @@ exports.shareBoard = async function (req, res) {
                 }
             }
             );
-            const changedBoardNew = await board.findOne({
+            const changedBoardNew = await db.board.findOne({
                 where: {
                     id,
                 }, raw: true
@@ -167,7 +168,7 @@ exports.getBoardsContribut = async function (req, res) {
     try {
         const { contributor, contributorId } = req.body;
         console.log(contributor);
-        const boardList = await board.findAll({ 
+        const boardList = await db.board.findAll({ 
             where: {
                 contributors: {[Op.contains]:[contributor]}
             }

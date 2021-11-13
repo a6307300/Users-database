@@ -1,15 +1,12 @@
 /* eslint-disable no-unused-vars */
-// const comment = require('../db/models/Comment');
-// const user = require ('../db/models/User');
 const jwt = require('jsonwebtoken');
 const { secret } = require('../tokenKey');
-// const User = require('../db/models/User');
 
 const db = require ('../db/models');
 
 exports.addComment = async function (req, res) {
     try {
-        const { commentText, authorName, authorAva} = req.body;
+        const { commentText} = req.body;
         const token = req.headers.authorization.split(' ')[1];
         const ownerData = jwt.verify(token, secret );
         const userID=ownerData.id;
@@ -18,13 +15,12 @@ exports.addComment = async function (req, res) {
             comment: commentText,
             userID,
             taskID,
-            authorName,
-            authorAva,
         });
         const newComment = await db.comment.findOne({
             where: {
                 comment: commentText,
-            }, raw: true
+            }, 
+            include: { model: db.user, as: 'author', attributes:['fullName', 'avatar'] }
         });
         return res.json(newComment);
     }
@@ -106,11 +102,11 @@ exports.getComments = async function (req, res) {
         const commentList = await db.comment.findAll({where: {
             taskID,
         },
-        include: { model: db.user, as: 'author1' },
+        include: { model: db.user, as: 'author', attributes:['fullName', 'avatar'] },
         order: [
             ['createdAt', 'DESC']
         ],
-        raw: true });
+        });
         return res.json(commentList);
     } catch (error) {
         console.log('getComments error:', error);

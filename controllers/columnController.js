@@ -1,10 +1,10 @@
-const column = require('../db/models/Column');
+const db = require ('../db/models');
 
 exports.addColumn = async function (req, res) {
     try {
         const columnName = req.body.columnName;
         const boardID = req.params.board;
-        const notClone = await column.findOne({
+        const notClone = await db.column.findOne({
             where: {
                 columnName,
                 boardID,
@@ -15,11 +15,11 @@ exports.addColumn = async function (req, res) {
                 message: 'У Вас уже есть колонка с таким именем!'
             });
         }
-        await column.create({
+        await db.column.create({
             columnName,
             boardID,
         });
-        const newColumn = await column.findOne({
+        const newColumn = await db.column.findOne({
             where: {
                 columnName,
             }, raw: true
@@ -35,13 +35,13 @@ exports.addColumn = async function (req, res) {
 exports.deleteColumn = async function (req, res) {
     try {
         const  id  = req.params.id;
-        const columnTarget = await column.findOne({
+        const columnTarget = await db.column.findOne({
             where: {
                 id,
             }
         });
         if (columnTarget) {
-            await column.destroy({
+            await db.column.destroy({
                 where: {
                     id,
                 }
@@ -58,14 +58,14 @@ exports.editColumn = async function (req, res) {
     try {
         const { columnName } = req.body;
         const id = req.params.id;
-        const changedColumn = await column.findOne({
+        const changedColumn = await db.column.findOne({
             where: {
                 id,
             }
         });
         if (changedColumn) {
-            await column.update({
-                columnName: columnName||column.columnName,
+            await db.column.update({
+                columnName: columnName||db.column.columnName,
             },
             {
                 where: {
@@ -73,7 +73,7 @@ exports.editColumn = async function (req, res) {
                 }
             }
             );
-            const changedColumnNew = await column.findOne({
+            const changedColumnNew = await db.column.findOne({
                 where: {
                     id,
                 }, raw: true
@@ -90,18 +90,18 @@ exports.replaceColumns = async function (req, res) {
     try {
         const { current, replaced } = req.body;
         console.log(req.body);
-        const currentColumn = await column.findOne({
+        const currentColumn = await db.column.findOne({
             where: {
                 id: current,
             }
         });
-        const replacedColumn = await column.findOne({
+        const replacedColumn = await db.column.findOne({
             where: {
                 id: replaced,
             }
         });
 
-        await column.update({
+        await db.column.update({
             order: currentColumn.order,
         },
         {
@@ -111,7 +111,7 @@ exports.replaceColumns = async function (req, res) {
         }
         );
 
-        await column.update({
+        await db.column.update({
             order: replacedColumn.order
         },
         {
@@ -120,7 +120,7 @@ exports.replaceColumns = async function (req, res) {
             }
         }
         );
-        const columnList = await column.findAll({ where: { 
+        const columnList = await db.column.findAll({ where: { 
             boardID: currentColumn.boardID 
         }, 
         order: [
@@ -140,7 +140,7 @@ exports.getColumns = async function (req, res) {
     try {
         console.log(req.params.board);
         const boardID = +req.params.board;
-        const columnList = await column.findAll({ 
+        const columnList = await db.column.findAll({ 
             where: { 
                 boardID 
             }, order: [
