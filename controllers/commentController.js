@@ -1,19 +1,19 @@
 /* eslint-disable no-unused-vars */
 const jwt = require('jsonwebtoken');
 const { secret } = require('../tokenKey');
-
+const { keyPrivate } = require('../RSAprivate');
 const db = require ('../db/models');
 
 exports.addComment = async function (req, res) {
     try {
         const { commentText} = req.body;
-        const token = req.headers.authorization.split(' ')[1];
-        const ownerData = jwt.verify(token, secret );
-        const userID=ownerData.id;
+        const token = req.headers.authorization;
+        const decoded = keyPrivate.decrypt(token, 'utf8');
+        const decodedId=+decoded.slice(6,decoded.length-1);
         const taskID = req.params.task;
         await db.comment.create({
             comment: commentText,
-            userID,
+            userID: decodedId,
             taskID,
         });
         const newComment = await db.comment.findOne({
@@ -34,13 +34,13 @@ exports.deleteComment = async function (req, res) {
     try {
         console.log(req.params);
         const  id  = +req.params.id;
-        const token = req.headers.authorization.split(' ')[1];
-        const ownerData = jwt.verify(token, secret );
-        const userID=+ownerData.id;
+        const token = req.headers.authorization;
+        const decoded = keyPrivate.decrypt(token, 'utf8');
+        const decodedId=+decoded.slice(6,decoded.length-1);
         const targetComment = await db.comment.findOne({
             where: {
                 id,
-                userID,
+                userID: decodedId,
             }, raw: true
         });
         console.log(targetComment);
@@ -62,14 +62,14 @@ exports.editComment = async function (req, res) {
     try {
         console.log(req.body);
         const { commentText} = req.body;
-        const token = req.headers.authorization.split(' ')[1];
-        const ownerData = jwt.verify(token, secret );
-        const userID=ownerData.id;
+        const token = req.headers.authorization;
+        const decoded = keyPrivate.decrypt(token, 'utf8');
+        const decodedId=+decoded.slice(6,decoded.length-1);
         const id = +req.params.id;
         const changedComment = await db.comment.findOne({
             where: {
                 id,
-                userID,
+                userID: decodedId,
             }
         });
         console.log(changedComment);
@@ -98,14 +98,23 @@ exports.editComment = async function (req, res) {
 
 exports.getComments = async function (req, res) {
     try {
-        const taskID = req.params.task;
-        const commentList = await db.comment.findAll({where: {
-            taskID,
-        },
-        include: { model: db.user, as: 'author', attributes:['fullName', 'avatar'] },
-        order: [
-            ['createdAt', 'DESC']
-        ],
+        const boardID = req.params.task;
+        // const boardID = req.body.board;
+        const commentList = await db.comment.findAll({
+            include: [{ model: db.user, as: 'author', attributes:['fullName', 'avatar'] },
+                { model: db.task, 
+                    include: {model: db.column,
+                        include: {model: db.board, 
+                            where: {
+                                id: boardID
+                            }}
+                    }
+                }],
+        
+            order: [
+                ['createdAt', 'DESC']
+            ],
+            // raw: true
         });
         return res.json(commentList);
     } catch (error) {

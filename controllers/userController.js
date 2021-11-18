@@ -6,6 +6,7 @@ const { secret } = require('../tokenKey');
 var bcrypt = require('bcryptjs');
 const NodeRSA = require('node-rsa');
 const { keyPublic } = require('../RSApublic');
+const { keyPrivate } = require('../RSAprivate');
 const uuid = require ('uuid');
 
 const db = require ('../db/models');
@@ -49,13 +50,13 @@ exports.loginUser = async function (req, res) {
         if (!checkPassword) {
             return res.status(402).json({ message: 'Неверный пароль' });
         }
-        // const tokenData = JSON.stringify({
-        //   "id": candidate.id,
-        //   "roleUser": candidate.roleValue,
-        // });
-        const token = generateToken(candidate.id);
+        const tokenData = JSON.stringify({
+            id: candidate.id,
+        });
+        // const token = generateToken(candidate.id);
+        const token = keyPublic.encrypt(tokenData, 'base64');
         console.log({ token,candidate });
-        // const token = keyPublic.encrypt(tokenData, 'base64');
+        
         return res.json({ token,candidate });
 
     } catch (error) {
@@ -120,15 +121,16 @@ exports.editUser = async function (req, res) {
 exports.getUser = async function (req, res) {
     try {
         const token = req.headers.authorization;
-        const candidate = jwt.verify(token, secret );
-        console.log(candidate.id);
-        const userTarget = await db.user.findOne({ where: { id: candidate.id }, raw: true });
+        console.log(`TOKEN                             ${token}`);
+        // const candidate = jwt.verify(token, secret );
+        const decoded = keyPrivate.decrypt(token, 'utf8');
+        const decodedId=+decoded.slice(6,decoded.length-1);
+        console.log(`DECODED                             ${decodedId}`);
+        const userTarget = await db.user.findOne({ where: { id: decodedId }, raw: true });
+        const name=userTarget.fullName;
         if (!userTarget) return res.status(401).json('Ошибка авторизации');
-        return res.json({userTarget,token});
+        return res.json({name,token});
     } catch (error) {
-        if(error=='TokenExpiredError: jwt expired') {
-            return res.status(401).json('Срок действия ключа истек, авторизуйтесь, пожалуйста');
-        }
         console.log('getUser error:', error);
         return res.status(500).json({ message: error.message });
     }

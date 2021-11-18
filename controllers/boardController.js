@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const { secret } = require('../tokenKey');
 const sequelize = require('sequelize');
 const {Op} = require('sequelize');
+const { keyPrivate } = require('../RSAprivate');
 
 const db = require ('../db/models');
 
@@ -10,13 +11,13 @@ exports.addBoard = async function (req, res) {
     try {
         console.log('req.b', req.body);
         const { boardName } = req.body;
-        const token = req.headers.authorization.split(' ')[1];
-        const ownerData = jwt.verify(token, secret );
-        const owner=ownerData.id;
+        const token = req.headers.authorization;
+        const decoded = keyPrivate.decrypt(token, 'utf8');
+        const decodedId=+decoded.slice(6,decoded.length-1);
         const notClone = await db.board.findOne({
             where: {
                 boardName,
-                owner,
+                owner:decodedId,
             }
         });
         if (notClone) {
@@ -26,7 +27,7 @@ exports.addBoard = async function (req, res) {
         }
         await db.board.create({
             boardName,
-            owner
+            owner:decodedId,
         });
         const newBoard = await db.board.findOne({
             where: {
@@ -36,9 +37,6 @@ exports.addBoard = async function (req, res) {
         return res.json(newBoard);
     }
     catch (error) {
-        if(error=='TokenExpiredError: jwt expired') {
-            return res.status(401).json('11111');
-        }
         console.log('addBoard error:', error);
         return res.status(500).json({ message: error.message });
     }
@@ -46,14 +44,14 @@ exports.addBoard = async function (req, res) {
 
 exports.deleteBoard = async function (req, res) {
     try {
-        const token = req.headers.authorization.split(' ')[1];
-        const ownerData = jwt.verify(token, secret );
-        const owner=ownerData.id;
+        const token = req.headers.authorization;
+        const decoded = keyPrivate.decrypt(token, 'utf8');
+        const decodedId=+decoded.slice(6,decoded.length-1);
         const  id  = req.params.id;
         const boardTarget = await db.board.findOne({
             where: {
                 id,
-                owner
+                owner: decodedId,
             }
         });
         if (boardTarget) {
@@ -65,9 +63,6 @@ exports.deleteBoard = async function (req, res) {
             return res.json(id);
         } else return res.status(403).json({ message: 'Доски с таким номером у Вас нет'});
     } catch (error) {
-        if(error=='TokenExpiredError: jwt expired') {
-            return res.status(401).json('11111');
-        }
         console.log('deleteBoard error', error);
         return res.status(500).json({ message: error.message });
     }
@@ -75,15 +70,15 @@ exports.deleteBoard = async function (req, res) {
 
 exports.editBoard = async function (req, res) {
     try {
-        const token = req.headers.authorization.split(' ')[1];
-        const ownerData = jwt.verify(token, secret );
-        const owner=ownerData.id;
+        const token = req.headers.authorization;
+        const decoded = keyPrivate.decrypt(token, 'utf8');
+        const decodedId=+decoded.slice(6,decoded.length-1);
         const { boardName} = req.body;
         const id = +req.params.id;
         const changedBoard = await db.board.findOne({
             where: {
                 id,
-                owner,
+                owner:decodedId,
             }
         });
         if (changedBoard) {
@@ -111,15 +106,13 @@ exports.editBoard = async function (req, res) {
 
 exports.getBoards = async function (req, res) {
     try {
-        const token = req.headers.authorization.split(' ')[1];
-        const owner = jwt.verify(token, secret );
-        console.log(owner);
-        const boardList = await db.board.findAll({ where: { owner: owner.id }, raw: true });
+        const token = req.headers.authorization;
+        const decoded = keyPrivate.decrypt(token, 'utf8');
+        const decodedId=+decoded.slice(6,decoded.length-1);
+        console.log(decodedId);
+        const boardList = await db.board.findAll({ where: { owner: decodedId }, raw: true });
         return res.json(boardList);
     } catch (error) {
-        if(error=='TokenExpiredError: jwt expired') {
-            return res.status(401).json('11111');
-        }
         console.log(error);
         return res.status(500).json({ message: error.message });
     }
@@ -127,16 +120,16 @@ exports.getBoards = async function (req, res) {
 
 exports.shareBoard = async function (req, res) {
     try {
-        const token = req.headers.authorization.split(' ')[1];
-        const ownerData = jwt.verify(token, secret );
-        const owner=ownerData.id;
+        const token = req.headers.authorization;
+        const decoded = keyPrivate.decrypt(token, 'utf8');
+        const decodedId=+decoded.slice(6,decoded.length-1);
         const { contributor } = req.body;
         const id = +req.params.id;
         
         const changedBoard = await db.board.findOne({
             where: {
                 id,
-                owner,
+                owner: decodedId,
                 contributors: {[Op.contains]:[contributor]}
             }
         });
@@ -171,13 +164,12 @@ exports.getBoardsContribut = async function (req, res) {
         const boardList = await db.board.findAll({ 
             where: {
                 contributors: {[Op.contains]:[contributor]}
-            }
-            , raw: true });
+            },
+            include: { model: db.user, attributes:['fullName', 'avatar'] },
+        });
+        console.log(boardList);
         return res.json(boardList);
     } catch (error) {
-        if(error=='TokenExpiredError: jwt expired') {
-            return res.status(401).json('jwt expired');
-        }
         console.log(error);
         return res.status(500).json({ message: error.message });
     }

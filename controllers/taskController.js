@@ -84,17 +84,20 @@ exports.editTask = async function (req, res) {
 
 exports.getTasks = async function (req, res) {
     try {
-        // const column = +req.params.column;
+        const board = +req.params.column;
         const taskList = await db.task.findAll({
-            // where: {
-            //     column,
-            // },
+            include: { model: db.column,        
+                where: {
+                    boardID:board,
+                },
+            },
             order: [
                 ['range', 'DESC'],
                 ['order', 'ASC'],
                 ['updatedAt', 'DESC']
             ],
             raw: true });
+        console.log(taskList);
         return res.json(taskList);
     } catch (error) {
         console.log('getTasks error:', error);
