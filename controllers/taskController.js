@@ -107,47 +107,70 @@ exports.getTasks = async function (req, res) {
 
 exports.replaceTask = async function (req, res) {
     try {
-        const { current, replaced } = req.body;
+        const { current, replaced, column, board } = req.body;
         console.log(req.body);
         const currentTask = await db.task.findOne({
             where: {
                 id: current,
             }
         });
-        const replacedTask = await db.task.findOne({
+        const replacedTask = replaced?await db.task.findOne({
             where: {
                 id: replaced,
             }
-        });
+        }):0;
         console.log(currentTask);
         console.log(replacedTask);
-        await db.task.update({
-            order: replacedTask.order+1,
-        },
-        {
-            where: {
-                id: replaced,
+        if(replacedTask) {
+            await db.task.update({
+                order: replacedTask.order+1,
+            },
+            {
+                where: {
+                    id: replaced,
+                }
             }
-        }
-        );
-        
-        await db.task.update({
-            order: replacedTask.order,
-            columnID: replacedTask.columnID,
-            range: replacedTask.range,
-        },
-        {
-            where: {
-                id: current,
+            );
+            await db.task.update({
+                order: replacedTask.order,
+                columnID: replacedTask.columnID,
+                range: replacedTask.range,
+            },
+            {
+                where: {
+                    id: current,
+                }
             }
+            );
+        } else {
+            const colId = await db.column.findOne({     
+                where: {
+                    boardID:board,
+                    columnName:column,
+                },
+            });
+            await db.task.update({
+                columnID: colId.id,
+            },
+            {
+                where: {
+                    id: current,
+                }
+            });
         }
-        );
-        const taskList = await db.task.findAll({order: [
-            ['range', 'DESC'],
-            ['order', 'ASC'],
-            ['updatedAt', 'DESC']
-        ],
-        raw: true });
+
+        const taskList = await db.task.findAll({
+            include: { model: db.column,        
+                where: {
+                    boardID:board,
+                },
+            },
+            order: [
+                ['range', 'DESC'],
+                ['order', 'ASC'],
+                ['updatedAt', 'DESC']
+            ],
+            raw: true });
         console.log(taskList);
         return res.json(taskList);
 

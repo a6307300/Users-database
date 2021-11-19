@@ -6,15 +6,15 @@ const { keyPrivate } = require('../RSAprivate');
 
 const auth = (req, res, next) => {
     try {
-        const token = req.headers.authorization.split(' ')[1];
-        console.log(token);
-        // const token = req.headers.authorization;
+        // const token = req.headers.authorization.split(' ')[1];
+        // console.log(token);
+        const token = req.headers.authorization;
 
         if (!token) {
             return res.status(400).json({ message: 'Пожалуйста, авторизуйтесь для доступа к этой странице' });
         }
-        const decoded = jwt.verify(token, secret);
-        // const decoded = keyPrivate.decrypt(token, 'utf8');
+        // const decoded = jwt.verify(token, secret);
+        const decoded = keyPrivate.decrypt(token, 'utf8');
         req.user = decoded;
         console.log(`Decoded: ${req.user}`);
     } catch (error) {

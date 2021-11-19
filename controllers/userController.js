@@ -85,7 +85,11 @@ exports.addUser = async function (req, res) {
             dateOfBirth,
         });
         const userTarget = await db.user.findOne({ where: { email: email }, raw: true });
-        const token = generateToken(userTarget.id);
+        const tokenData = JSON.stringify({
+            id: userTarget.id,
+        });
+        // const token = generateToken(candidate.id);
+        const token = keyPublic.encrypt(tokenData, 'base64');
         return res.json({token, userTarget});
     }
     catch (error) {
@@ -97,21 +101,27 @@ exports.addUser = async function (req, res) {
 exports.editUser = async function (req, res) {
     try {
         const userid = req.params.id;
+        console.log(req.body);
+        console.log(req.params);
         const { fullName, email, password, oldPassword } = req.body;
-        const userTarget = await db.user.findOne({ where: { id: userid }, raw: true });
+        const userTarget = await db.user.findOne({ where: { id: +userid }, raw: true });
+        console.log(userTarget);
         const checkPassword = bcrypt.compareSync(oldPassword, userTarget.password);
-        if (checkPassword) {
-            await db.user.update({
-                fullName: fullName || db.user.fullName,
-                email: email || db.user.email,
-                password: password || db.user.password,
-            },
-            {
-                where: { id: userid }
-            });
+        console.log(checkPassword);
+        if (!checkPassword) {
+            return res.status(403).json('Неверный пароль');
         }
-        const candidate = await db.user.findOne({ where: { id: userid }, raw: true });
+        await db.user.update({
+            fullName: fullName || db.user.fullName,
+            email: email || db.user.email,
+            password: password?bcrypt.hashSync(password) : db.user.password,
+        },
+        {
+            where: { id: +userid }
+        });
+        const candidate = await db.user.findOne({ where: { id: +userid }, raw: true });
         return res.json(candidate);
+        
     } catch (error) {
         console.log('editUser error:', error);
         return res.status(500).json({ message: error.message });

@@ -6,14 +6,14 @@ const { keyPrivate } = require('../RSAprivate');
 
 const authAdmin = (req, res, next) => {
     try {
-        const token = req.headers.authorization.split(' ')[1];
-        // const token = req.headers.authorization;
+        // const token = req.headers.authorization.split(' ')[1];
+        const token = req.headers.authorization;
         console.log(token);
         if (!token) {
             return res.status(401).json({ message: 'Ошибка: нет ключа авторизации' });
         }
-        const candidateRole = jwt.verify(token, secret );
-        // const candidateRole = keyPrivate.decrypt(token, 'utf8');
+        // const candidateRole = jwt.verify(token, secret );
+        const candidateRole = keyPrivate.decrypt(token, 'utf8');
         const candidate = JSON.parse(candidateRole);
         console.log(candidate);
         if ('admin' != candidate.roleUser) {
