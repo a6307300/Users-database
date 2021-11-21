@@ -14,6 +14,7 @@ userRouter.post('/', [
 ],
 userControllers.addUser);
 userRouter.get('/', userControllers.getUser);
+userRouter.get('/all', userControllers.getUsers);
 userRouter.patch('/:id', auth, userControllers.editUser);
 userRouter.post('/:id/avatar', [auth, imagesMiddleware.single('file')],  userControllers.uploadAvatar);
 

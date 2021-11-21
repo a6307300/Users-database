@@ -134,6 +134,9 @@ exports.getUser = async function (req, res) {
         console.log(`TOKEN                             ${token}`);
         // const candidate = jwt.verify(token, secret );
         const decoded = keyPrivate.decrypt(token, 'utf8');
+        if(!decoded) {
+            return res.status(401).json('11111');
+        }
         const decodedId=+decoded.slice(6,decoded.length-1);
         console.log(`DECODED                             ${decodedId}`);
         const userTarget = await db.user.findOne({ where: { id: decodedId }, raw: true });
@@ -153,6 +156,16 @@ exports.deleteUser = async function (req, res) {
         res.json(`пользователь c ${userId} удален`);
     } catch (error) {
         console.log('deleteUser error', error);
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+exports.getUsers = async function (req, res) {
+    try {
+        const users = await db.user.findAll({ attributes: ['id', 'fullName'], raw:true});
+        return res.json(users);
+    } catch (error) {
+        console.log('getUsers error:', error);
         return res.status(500).json({ message: error.message });
     }
 };
