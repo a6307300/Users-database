@@ -32,7 +32,6 @@ exports.addComment = async function (req, res) {
 
 exports.deleteComment = async function (req, res) {
     try {
-        console.log(req.params);
         const  id  = +req.params.id;
         const token = req.headers.authorization;
         const decoded = keyPrivate.decrypt(token, 'utf8');
@@ -43,7 +42,6 @@ exports.deleteComment = async function (req, res) {
                 userID: decodedId,
             }, raw: true
         });
-        console.log(targetComment);
         if (targetComment) {
             await db.comment.destroy({
                 where: {
@@ -60,7 +58,6 @@ exports.deleteComment = async function (req, res) {
 
 exports.editComment = async function (req, res) {
     try {
-        console.log(req.body);
         const { commentText} = req.body;
         const token = req.headers.authorization;
         const decoded = keyPrivate.decrypt(token, 'utf8');
@@ -72,7 +69,6 @@ exports.editComment = async function (req, res) {
                 userID: decodedId,
             }
         });
-        console.log(changedComment);
         if (changedComment) {
             await db.comment.update({
                 comment: commentText,

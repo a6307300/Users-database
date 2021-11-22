@@ -49,7 +49,6 @@ exports.deleteTask = async function (req, res) {
 
 exports.editTask = async function (req, res) {
     try {
-        console.log(req.body);
         const { taskName, description, range } = req.body;
         const id = req.params.id;
         const changedTask = await db.task.findOne({
@@ -97,7 +96,6 @@ exports.getTasks = async function (req, res) {
                 ['updatedAt', 'DESC']
             ],
             raw: true });
-        console.log(taskList);
         return res.json(taskList);
     } catch (error) {
         console.log('getTasks error:', error);
@@ -108,19 +106,16 @@ exports.getTasks = async function (req, res) {
 exports.replaceTask = async function (req, res) {
     try {
         const { current, replaced, column, board } = req.body;
-        console.log(req.body);
-        const currentTask = await db.task.findOne({
-            where: {
-                id: current,
-            }
-        });
+        // const currentTask = await db.task.findOne({
+        //     where: {
+        //         id: current,
+        //     }
+        // });
         const replacedTask = replaced?await db.task.findOne({
             where: {
                 id: replaced,
             }
         }):0;
-        console.log(currentTask);
-        console.log(replacedTask);
         if(replacedTask) {
             await db.task.update({
                 order: replacedTask.order+1,
@@ -171,7 +166,6 @@ exports.replaceTask = async function (req, res) {
                 ['updatedAt', 'DESC']
             ],
             raw: true });
-        console.log(taskList);
         return res.json(taskList);
 
     } catch (error) {

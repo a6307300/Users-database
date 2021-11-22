@@ -89,7 +89,6 @@ exports.editColumn = async function (req, res) {
 exports.replaceColumns = async function (req, res) {
     try {
         const { current, replaced } = req.body;
-        console.log(req.body);
         const currentColumn = await db.column.findOne({
             where: {
                 id: current,
@@ -127,7 +126,6 @@ exports.replaceColumns = async function (req, res) {
             ['order', 'ASC']
         ],
         raw: true });
-        console.log(columnList);
         return res.json(columnList);
 
     } catch (error) {
@@ -138,7 +136,6 @@ exports.replaceColumns = async function (req, res) {
 
 exports.getColumns = async function (req, res) {
     try {
-        console.log(req.params.board);
         const boardID = +req.params.board;
         const columnList = await db.column.findAll({ 
             where: { 

@@ -9,7 +9,6 @@ const db = require ('../db/models');
 
 exports.addBoard = async function (req, res) {
     try {
-        console.log('req.b', req.body);
         const { boardName } = req.body;
         const token = req.headers.authorization;
         const decoded = keyPrivate.decrypt(token, 'utf8');
@@ -109,7 +108,6 @@ exports.getBoards = async function (req, res) {
         const token = req.headers.authorization;
         const decoded = keyPrivate.decrypt(token, 'utf8');
         const decodedId=+decoded.slice(6,decoded.length-1);
-        console.log(decodedId);
         const boardList = await db.board.findAll({ where: { owner: decodedId }, raw: true });
         return res.json(boardList);
     } catch (error) {
@@ -160,14 +158,12 @@ exports.shareBoard = async function (req, res) {
 exports.getBoardsContribut = async function (req, res) {
     try {
         const { contributor, contributorId } = req.body;
-        console.log(contributor);
         const boardList = await db.board.findAll({ 
             where: {
                 contributors: {[Op.contains]:[contributor]}
             },
             include: { model: db.user, attributes:['fullName', 'avatar'] },
         });
-        console.log(boardList);
         return res.json(boardList);
     } catch (error) {
         console.log(error);

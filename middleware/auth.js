@@ -16,7 +16,6 @@ const auth = (req, res, next) => {
         // const decoded = jwt.verify(token, secret);
         const decoded = keyPrivate.decrypt(token, 'utf8');
         req.user = decoded;
-        console.log(`Decoded: ${req.user}`);
     } catch (error) {
         console.log('auth error:', error);
         return res.status(401).json({ message: 'Проблема в auth.js' });

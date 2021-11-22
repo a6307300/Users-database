@@ -39,7 +39,6 @@ exports.uploadAvatar = async function (req, res) {
 
 exports.loginUser = async function (req, res) {
     try {
-        console.log('req.b login', req.body);
         const { email, password } = req.body;
         const candidate = await db.user.findOne({ where: { email: email } });
         if (!candidate) {
@@ -54,9 +53,7 @@ exports.loginUser = async function (req, res) {
             id: candidate.id,
         });
         // const token = generateToken(candidate.id);
-        const token = keyPublic.encrypt(tokenData, 'base64');
-        console.log({ token,candidate });
-        
+        const token = keyPublic.encrypt(tokenData, 'base64');      
         return res.json({ token,candidate });
 
     } catch (error) {
@@ -67,7 +64,6 @@ exports.loginUser = async function (req, res) {
 
 exports.addUser = async function (req, res) {
     try {
-        console.log('req.b', req.body);
         const { fullName, email, password, dateOfBirth } = req.body;
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -101,13 +97,9 @@ exports.addUser = async function (req, res) {
 exports.editUser = async function (req, res) {
     try {
         const userid = req.params.id;
-        console.log(req.body);
-        console.log(req.params);
         const { fullName, email, password, oldPassword } = req.body;
         const userTarget = await db.user.findOne({ where: { id: +userid }, raw: true });
-        console.log(userTarget);
         const checkPassword = bcrypt.compareSync(oldPassword, userTarget.password);
-        console.log(checkPassword);
         if (!checkPassword) {
             return res.status(403).json('Неверный пароль');
         }
@@ -131,14 +123,12 @@ exports.editUser = async function (req, res) {
 exports.getUser = async function (req, res) {
     try {
         const token = req.headers.authorization;
-        console.log(`TOKEN                             ${token}`);
         // const candidate = jwt.verify(token, secret );
         const decoded = keyPrivate.decrypt(token, 'utf8');
         if(!decoded) {
             return res.status(401).json('11111');
         }
         const decodedId=+decoded.slice(6,decoded.length-1);
-        console.log(`DECODED                             ${decodedId}`);
         const userTarget = await db.user.findOne({ where: { id: decodedId }, raw: true });
         const name=userTarget.fullName;
         if (!userTarget) return res.status(401).json('Ошибка авторизации');
